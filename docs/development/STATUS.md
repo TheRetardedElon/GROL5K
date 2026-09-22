@@ -32,9 +32,17 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - v0.3 adversarial review edits: state ownership, Host API isolation, provider-hosted tool ban, confirmation digests, EROFS correction
 - v0.4 GPT follow-up: explicit HA entity-level mutation policy, scripts/scenes disabled in v0, dedicated `grol-hostd`, socket ownership clarified
 
+## M0 attempt history
+
+- OS build #1/#2 reached the inherited builder-image step and failed before any OS compilation.
+- Root cause: GHCR/Docker repository names must be lowercase, while `github.repository_owner` resolves to `TheRetardedElon`.
+- Repository rename to lowercase does not change the owner login value used by the workflow.
+- Fix: normalize the GHCR owner to lowercase before constructing `ghcr.io/<owner>/haos-builder`.
+- This is a build-workflow portability bug, not an OS/runtime failure and does not count as an M0 build attempt reaching Buildroot.
+
 ## Immediate priorities
 
-1. Run the inherited fork-safe **OS build** workflow for `ova` with tests enabled.
+1. Merge the lowercase GHCR builder-path fix, then rerun the inherited fork-safe **OS build** workflow for `ova` with tests enabled.
 2. Boot and validate the image in QEMU.
 3. Record hashes, host details, logs, and test results.
 4. Only after M0 passes, begin M1 visible identity changes.
