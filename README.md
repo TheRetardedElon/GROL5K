@@ -197,13 +197,22 @@ grol5000_rpi5_defconfig
 
 Start here:
 
+- [Current development status](docs/development/STATUS.md)
 - [Architecture overview](docs/architecture/OVERVIEW.md)
+- [Component boundaries](docs/architecture/COMPONENT_BOUNDARIES.md)
 - [AI control plane](docs/architecture/AI_CONTROL_PLANE.md)
 - [Security model](docs/architecture/SECURITY_MODEL.md)
+- [Codebase map](docs/development/CODEBASE_MAP.md)
+- [M0 baseline checklist](docs/development/M0_BASELINE_CHECKLIST.md)
+- [M1 identity conversion map](docs/development/M1_IDENTITY_MAP.md)
+- [Human + GPT + Grok collaboration protocol](docs/development/AI_COLLABORATION.md)
+- [Grok onboarding packet](docs/development/GROK_ONBOARDING.md)
 - [Development roadmap](docs/development/ROADMAP.md)
 - [Building GROL5K](docs/development/BUILDING.md)
 - [Upstream baseline and sync policy](GROL_UPSTREAM.md)
 - [ADR-0001 — HAOS downstream strategy](docs/decisions/0001-haos-downstream.md)
+- [ADR-0002 — compatibility boundary](docs/decisions/0002-compatibility-boundary.md)
+- [Action Broker v0 contract](grol/specs/ACTION_BROKER_V0.md)
 
 ---
 

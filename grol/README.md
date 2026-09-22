@@ -1,15 +1,30 @@
 # GROL Platform Layer
 
-This directory is reserved for GROL5K-owned source, metadata, policies, services, release definitions, and branding that should remain clearly separated from upstream HAOS code where practical.
+This directory contains GROL5K-owned source, metadata, policies, service definitions, release tooling, specifications, and branding that should remain clearly separated from inherited HAOS code wherever practical.
 
-Planned structure:
+Current structure:
 
 ```text
 grol/
-├── branding/
-├── policies/
-├── release/
-└── services/
+├── branding/       # OS/UI visual identity and boot assets
+├── policies/       # authorization and security policy
+├── release/        # GROL release metadata and tooling
+├── services/       # GROL-owned host/user-space services
+└── specs/          # cross-service contracts and schemas
 ```
 
-The exact Buildroot packaging layout will be chosen after M0 reproduces and boots the upstream baseline.
+## Rules
+
+- Prefer new GROL components here instead of embedding unrelated logic into inherited HAOS files.
+- Patch inherited HAOS code only when the integration point genuinely belongs there.
+- Do not place secrets or signing keys in this tree.
+- Cross-component interfaces should be documented under `grol/specs/`.
+- Privileged AI actions must go through the Action Broker boundary.
+- Keep compatibility-sensitive HAOS identifiers unchanged until an ADR and validation plan explicitly approve migration.
+
+## Current specs
+
+- [Action Broker v0](specs/ACTION_BROKER_V0.md)
+- [Action request JSON schema](specs/action-request.schema.json)
+
+The exact Buildroot package layout for GROL services will be finalized after M0 reproduces and boots the inherited OVA baseline.
