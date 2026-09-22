@@ -7,20 +7,24 @@
   "required": ["version", "request_id", "session_id", "actor", "tool", "arguments"],
   "properties": {
     "version": {"const": "grol.action.v0"},
-    "request_id": {"type": "string", "minLength": 1},
-    "session_id": {"type": "string", "minLength": 1},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "session_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "turn_id": {"type": "string", "minLength": 1, "maxLength": 128},
     "actor": {
       "type": "object",
       "additionalProperties": false,
       "required": ["type", "instance"],
       "properties": {
         "type": {"enum": ["grok-bot", "user", "system"]},
-        "instance": {"type": "string", "minLength": 1}
+        "instance": {"type": "string", "minLength": 1, "maxLength": 64}
       }
     },
-    "tool": {"type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)+$"},
+    "tool": {"type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)+$", "maxLength": 128},
     "risk": {"enum": ["tier0", "tier1", "tier2", "tier3", "tier4"]},
-    "arguments": {"type": "object"},
+    "arguments": {
+      "type": "object",
+      "additionalProperties": true
+    },
     "reason": {"type": "string", "maxLength": 1000}
   }
 }

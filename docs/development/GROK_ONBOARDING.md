@@ -24,6 +24,7 @@ Build GROL5000 into a real smart-environment operating system descended from HAO
 14. `grol/specs/HOST_API_V0.md`
 15. `grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md`
 16. `grol/specs/VOICE_REALTIME_V0.md`
+17. `grol/specs/ACTION_BROKER_V0.md`
 
 ## Current phase
 
@@ -31,24 +32,27 @@ Foundation / M0 preparation.
 
 The project must first reproduce and boot the inherited OVA target before deep customization.
 
+The inherited HAOS root filesystem is **EROFS**, not squashfs.
+
 ## Grok review status
 
-The initial repository/architecture review has been incorporated. The project now locks Grok and Grok Bot to first-class userspace services rather than kernel components.
+v0.2 specs landed in PR #4. v0.3 adversarial review tightened:
 
-Current review targets:
+- state ownership (preferences vs durable memory vs HA/system/secrets)
+- Host API caller isolation and model-facing redaction
+- provider-hosted tool ban (web_search / MCP / collections)
+- confirmation token + argument digest
+- voice transport ownership and cancellation triad
+- xAI annex on `AI_PROVIDER_V0.md` without coupling the OS to one wire format
 
-1. Review the normalized provider capability/event contract in `grol/specs/AI_PROVIDER_V0.md` against current xAI/Grok APIs.
-2. Review `grol/specs/GROK_BOT_RUNTIME_V0.md`, especially memory/state ownership.
-3. Review `grol/specs/HOST_API_V0.md` and keep the host surface intentionally tiny.
-4. Adversarially review `grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md`.
-5. Review `grol/specs/VOICE_REALTIME_V0.md` for xAI realtime session/cancellation semantics.
-6. Do not implement M3/M4 runtime code until M0 has real build/boot evidence.
+Do not implement M3/M4 runtime code until M0 has real build/boot evidence.
 
 ## Do not do yet
 
 - do not replace Supervisor
 - do not rename RAUC compatibility
-- do not give Grok Bot Docker socket access
+- do not give Grok Bot Docker socket or Host API socket access
 - do not put xAI credentials into the image
+- do not enable provider-hosted tools
 - do not rewrite HAOS internals for aesthetics
 - do not claim M0 passed without a real build and boot
