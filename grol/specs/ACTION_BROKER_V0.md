@@ -1,7 +1,7 @@
 # GROL Action Broker v0 Contract
 
 **Status:** design draft.  
-**Revised:** 2026-09-22 (v0.3 adversarial review)
+**Revised:** 2026-09-22 (v0.4 policy hardening)
 
 The Action Broker is the only approved path from AI intent to privileged execution.
 
@@ -46,15 +46,17 @@ Allowed decisions: `denied`, `confirmation_required`, `executed`, `failed`.
 1. Unknown tools are denied.
 2. Tool risk tier is defined by broker policy, not by the model.
 3. Model-provided `risk` and `reason` are advisory inputs only.
-4. Arguments are validated against a per-tool schema with `additionalProperties: false`.
+4. The generic request envelope accepts an `arguments` object, but execution requires a **tool-specific** schema with `additionalProperties: false`.
 5. Security-sensitive tools require explicit authorization policy.
 6. No generic `shell.exec` tool exists in the normal agent catalog.
 7. Credentials are resolved by the executor, not supplied by the model.
 8. Every accepted request receives an audit record.
 9. Tool responses are bounded, labeled untrusted, and redacted before returning to the model.
 10. Confirmation is a broker event. Model prose and spoken "yes" cannot satisfy it.
-11. A confirmation token binds `sha256(tool + canonical_json(normalized_args))`. Digest drift is deny.
+11. A confirmation token binds the versioned digest defined in `HOME_ASSISTANT_TOOL_POLICY_V0.md`. Digest drift is deny.
 12. Entity IDs for mutating HA calls are re-resolved against the live registry at execute time.
+13. Domain + service eligibility is never sufficient by itself; every resolved mutation target must pass entity-level broker policy.
+14. Area/device/group expansion is all-or-nothing: if any resolved target is denied or unresolved, the call is denied.
 
 ## Initial tool namespaces
 
@@ -71,26 +73,22 @@ grol.hardware.status
 
 Host-mutating tools are deferred until the policy engine and confirmation UX exist.
 
-## Home Assistant service-call allowlist (v0)
+## Home Assistant mutation policy (v0)
 
-`homeassistant.service.call` is not "any HA service."
+The normative v0 policy is defined in:
 
-v0 allowlist is domain + service. Starting set:
+- `grol/specs/HOME_ASSISTANT_TOOL_POLICY_V0.md`
+
+The initial AI mutation surface is intentionally smaller than Home Assistant itself.
+
+Eligible service names are limited to:
 
 - `light.turn_on` / `light.turn_off` / `light.toggle`
 - `switch.turn_on` / `switch.turn_off` / `switch.toggle`
-- `script.turn_on` (existing scripts only; no script create/update)
-- `scene.turn_on` (existing scenes only)
 
-v0 deny on the AI path includes at least:
+Even these require entity-level allowlisting and live registry resolution.
 
-- `shell_command.*`
-- `command_line.*`
-- `rest_command.*`
-- `python_script.*`
-- `system_log.*`
-- automation / script / helper **create or update**
-- lock / alarm / cover / security domains until an explicit later policy says otherwise
+`script.turn_on` and `scene.turn_on` are **disabled in v0** because their transitive effects can bypass a domain/service allowlist.
 
 Unknown domain+service pairs are denied.
 

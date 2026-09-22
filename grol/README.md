@@ -31,6 +31,7 @@ grol/
 - [GROL Host API v0](specs/HOST_API_V0.md)
 - [Tool / Prompt Injection Threat Model v0](specs/THREAT_MODEL_TOOL_INJECTION_V0.md)
 - [Voice / Realtime Session v0](specs/VOICE_REALTIME_V0.md)
+- [Home Assistant Tool Policy v0](specs/HOME_ASSISTANT_TOOL_POLICY_V0.md)
 - [GROL services map](services/README.md)
 
 The exact Buildroot package layout for GROL services will be finalized after M0 reproduces and boots the inherited OVA baseline.
