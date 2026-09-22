@@ -25,7 +25,7 @@ Build GROL5000 into a real smart-environment operating system descended from HAO
 15. `grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md`
 16. `grol/specs/VOICE_REALTIME_V0.md`
 17. `grol/specs/HOME_ASSISTANT_TOOL_POLICY_V0.md`
-17. `grol/specs/ACTION_BROKER_V0.md`
+18. `grol/specs/ACTION_BROKER_V0.md`
 
 ## Current phase
 
@@ -37,14 +37,9 @@ The inherited HAOS root filesystem is **EROFS**, not squashfs.
 
 ## Grok review status
 
-v0.2 specs landed in PR #4. v0.3 adversarial review tightened:
+v0.2 specs landed in PR #4. v0.3 adversarial review tightened state, Host API isolation, hosted tools, and confirmation.
 
-- state ownership (preferences vs durable memory vs HA/system/secrets)
-- Host API caller isolation and model-facing redaction
-- provider-hosted tool ban (web_search / MCP / collections)
-- confirmation token + argument digest
-- voice transport ownership and cancellation triad
-- xAI annex on `AI_PROVIDER_V0.md` without coupling the OS to one wire format
+v0.4/v0.4.1 add entity-level HA mutation policy, disable scripts/scenes, and introduce `grol-hostd` as the Host API owner.
 
 Do not implement M3/M4 runtime code until M0 has real build/boot evidence.
 

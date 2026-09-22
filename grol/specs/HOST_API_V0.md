@@ -1,7 +1,7 @@
 # GROL Host API v0
 
 **Status:** design draft.  
-**Revised:** 2026-09-22 (v0.4 policy hardening)
+**Revised:** 2026-09-22 (v0.4.1 Grok follow-up)
 
 ## Purpose
 
@@ -17,6 +17,19 @@ A dedicated M2 host service, `grol-hostd`, owns the Host API.
 
 This avoids making `grol-action-broker` the implementation of the host-information plane and keeps the broker focused on policy/execution.
 
+`grol-hostd` is an **information plane**. It answers reviewed read-only probes. It does not authorize AI actions and it does not execute Home Assistant services.
+
+### Relationship to HAOS OS Agent
+
+HAOS already has `os-agent` plus D-Bus surfaces used by Supervisor. `grol-hostd` must not become a second unpublished D-Bus stack.
+
+Rules:
+
+- If a probe already exists on a documented OS Agent / systemd / RAUC interface, `grol-hostd` should wrap that interface rather than reimplement it.
+- GROL-owned identity, health aggregation, and model-facing redaction still belong in GROL services.
+- Supervisor and OS Agent remain compatibility plumbing. They are not AI callers.
+- Replacing OS Agent is out of scope through M5.
+
 ## Transport
 
 v0 uses a Unix domain stream socket with filesystem permissions **and** peer credential checks.
@@ -28,9 +41,11 @@ Runtime tmpfs (`/run`), not the EROFS root filesystem.
 
 Recommended systemd socket ownership:
 
-- owner: `root`
+- socket owner: `root` or the dedicated `grol-hostd` user
 - group: dedicated `grol-hostapi` group
 - mode: `0660`
+
+The `grol-hostd` process should run as a dedicated non-root user when the required probes allow it. Root is not the default identity for the daemon just because the socket is created by systemd.
 
 Only explicitly approved service UIDs belong to that group. Membership is necessary but not sufficient: `grol-hostd` also validates `SO_PEERCRED` against an exact UID/unit allowlist.
 
@@ -52,6 +67,7 @@ MUST NOT connect:
 - `grol-ai-gateway`
 - Home Assistant Core
 - Supervisor
+- OS Agent as a client of this socket
 - any add-on/app
 - any process running model code
 
@@ -179,6 +195,7 @@ The eventual `grol-hostd.service` should start from a restrictive systemd/AppArm
 
 Design targets include:
 
+- dedicated non-root user when probes allow it
 - `NoNewPrivileges=yes`
 - read-only system filesystem by default
 - no shell execution API

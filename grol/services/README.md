@@ -31,4 +31,4 @@ Before implementation, each service needs:
 
 No GROL AI service should require direct Docker socket access.
 
-`grol-hostd` is a host service, not model code. It exposes only the reviewed Host API contract and must not become a general shell/administration daemon.
+`grol-hostd` is a host information-plane service, not model code and not a second policy engine. It wraps documented OS Agent / systemd / RAUC probes where those already exist. It must not become a general shell/administration daemon or an unpublished D-Bus stack.
