@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/branding/grol5000-banner.jpg" alt="GROL5000 — Global Robotic Overlord Logic">
+  <img src="https://i.imgur.com/kBDHbaq.png" width="900" alt="GROL5000 — Global Robotic Overlord Logic">
 </p>
 
 <h1 align="center">GROL5K</h1>
