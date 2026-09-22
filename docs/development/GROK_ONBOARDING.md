@@ -24,6 +24,7 @@ Build GROL5000 into a real smart-environment operating system descended from HAO
 14. `grol/specs/HOST_API_V0.md`
 15. `grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md`
 16. `grol/specs/VOICE_REALTIME_V0.md`
+17. `grol/specs/HOME_ASSISTANT_TOOL_POLICY_V0.md`
 17. `grol/specs/ACTION_BROKER_V0.md`
 
 ## Current phase

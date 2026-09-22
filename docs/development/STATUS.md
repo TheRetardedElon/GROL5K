@@ -30,6 +30,7 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - AI provider adapter contract, including xAI annex
 - Grok Bot runtime, Host API, tool-injection threat model, and voice/realtime specs
 - v0.3 adversarial review edits: state ownership, Host API isolation, provider-hosted tool ban, confirmation digests, EROFS correction
+- v0.4 GPT follow-up: explicit HA entity-level mutation policy, scripts/scenes disabled in v0, dedicated `grol-hostd`, socket ownership clarified
 
 ## Immediate priorities
 

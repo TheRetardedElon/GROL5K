@@ -219,6 +219,7 @@ Start here:
 - [GROL Host API v0](grol/specs/HOST_API_V0.md)
 - [Tool/prompt injection threat model v0](grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md)
 - [Voice/realtime session v0](grol/specs/VOICE_REALTIME_V0.md)
+- [Home Assistant tool policy v0](grol/specs/HOME_ASSISTANT_TOOL_POLICY_V0.md)
 - [Build-record evidence](docs/build-records/README.md)
 
 ---

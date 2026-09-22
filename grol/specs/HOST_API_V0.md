@@ -1,7 +1,7 @@
 # GROL Host API v0
 
 **Status:** design draft.  
-**Revised:** 2026-09-22 (v0.3 adversarial review)
+**Revised:** 2026-09-22 (v0.4 policy hardening)
 
 ## Purpose
 
@@ -11,18 +11,32 @@ The API is consumed by trusted GROL components such as `grol-action-broker`.
 
 It is not a general-purpose host administration API.
 
+## Server ownership
+
+A dedicated M2 host service, `grol-hostd`, owns the Host API.
+
+This avoids making `grol-action-broker` the implementation of the host-information plane and keeps the broker focused on policy/execution.
+
 ## Transport
 
-Preferred initial options:
+v0 uses a Unix domain stream socket with filesystem permissions **and** peer credential checks.
 
-1. Unix domain socket with filesystem permissions and peer credential checks.
-2. Loopback HTTP only if Unix-socket integration materially complicates implementation.
-
-Do not expose this API on LAN/WAN by default.
+Do not expose this API on LAN/WAN.
 
 Socket path: `/run/grol/hostapi.sock`  
-Runtime tmpfs (`/run`), not the EROFS root filesystem.  
-Mode `0600`. Not bind-mounted into Bot or Gateway containers.
+Runtime tmpfs (`/run`), not the EROFS root filesystem.
+
+Recommended systemd socket ownership:
+
+- owner: `root`
+- group: dedicated `grol-hostapi` group
+- mode: `0660`
+
+Only explicitly approved service UIDs belong to that group. Membership is necessary but not sufficient: `grol-hostd` also validates `SO_PEERCRED` against an exact UID/unit allowlist.
+
+Bot and Gateway are not members of the group and the socket is not bind-mounted into their containers.
+
+Loopback TCP/HTTP is deferred; adding a network socket requires a separate ADR.
 
 ## Callers (v0 allowlist)
 
@@ -41,9 +55,11 @@ MUST NOT connect:
 - any add-on/app
 - any process running model code
 
-Authorization: `SO_PEERCRED` / `SCM_CREDENTIALS` is mandatory.  
+Authorization uses `SO_PEERCRED` on the connected Unix socket.  
 UID/unit allowlist is mandatory.  
 A capability token is **not** a substitute for peer credentials.
+
+If the implementation later changes transport semantics, credential passing must be re-reviewed rather than assuming `SCM_CREDENTIALS` and `SO_PEERCRED` are interchangeable.
 
 ## Read-only v0 endpoints
 
@@ -96,6 +112,7 @@ Returns bounded summaries:
 
 MAY report only these names:
 
+- `grol-hostd`
 - `grol-healthd`
 - `grol-identity`
 - `grol-provision`
@@ -155,6 +172,22 @@ Each requires:
 - confirmation UX
 - audit logging
 - failure/rollback semantics
+
+## Minimum service hardening
+
+The eventual `grol-hostd.service` should start from a restrictive systemd/AppArmor posture and open only what its read-only probes require.
+
+Design targets include:
+
+- `NoNewPrivileges=yes`
+- read-only system filesystem by default
+- no shell execution API
+- no Docker socket
+- no model/provider network access
+- AF_UNIX-only listener
+- explicit filesystem/device exceptions rather than broad host access
+
+Exact unit/AppArmor directives are implementation work for M2 and must be tested against the probes actually needed.
 
 ## Response rules
 

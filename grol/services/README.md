@@ -6,6 +6,7 @@ Planned services:
 
 | Service | Purpose | Earliest milestone |
 |---|---|---|
+| `grol-hostd` | serve the narrow local Host API over `/run/grol/hostapi.sock` | M2 |
 | `grol-healthd` | aggregate GROL service/platform health | M2 |
 | `grol-identity` | expose GROL version, build, target and identity | M2 |
 | `grol-provision` | first-run and credential provisioning | M2 |
@@ -29,3 +30,5 @@ Before implementation, each service needs:
 - tests
 
 No GROL AI service should require direct Docker socket access.
+
+`grol-hostd` is a host service, not model code. It exposes only the reviewed Host API contract and must not become a general shell/administration daemon.
