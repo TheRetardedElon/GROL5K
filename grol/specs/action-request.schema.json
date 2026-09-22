@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grol5k.local/schemas/action-request-v0.json",
+  "title": "GROL Action Request v0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "request_id", "session_id", "actor", "tool", "arguments"],
+  "properties": {
+    "version": {"const": "grol.action.v0"},
+    "request_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "instance"],
+      "properties": {
+        "type": {"enum": ["grok-bot", "user", "system"]},
+        "instance": {"type": "string", "minLength": 1}
+      }
+    },
+    "tool": {"type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)+$"},
+    "risk": {"enum": ["tier0", "tier1", "tier2", "tier3", "tier4"]},
+    "arguments": {"type": "object"},
+    "reason": {"type": "string", "maxLength": 1000}
+  }
+}
