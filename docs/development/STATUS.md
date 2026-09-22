@@ -24,13 +24,12 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - upstream sync policy
 - development roadmap
 - initial build documentation
-- first architecture decision record
+- architecture decision records 0001–0003
 - GROL foundation guardrails and CI workflow
 - build-record evidence generator
-- initial AI provider adapter contract
-- Grok repository review incorporated into architecture
-- ADR-0003: Grok/Grok Bot are first-class userspace services, not kernel components
-- Grok Bot runtime, Host API, tool-injection threat model, and voice/realtime v0 specs
+- AI provider adapter contract, including xAI annex
+- Grok Bot runtime, Host API, tool-injection threat model, and voice/realtime specs
+- v0.3 adversarial review edits: state ownership, Host API isolation, provider-hosted tool ban, confirmation digests, EROFS correction
 
 ## Immediate priorities
 

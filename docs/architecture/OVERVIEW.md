@@ -29,6 +29,10 @@ The goal is not merely to reskin HAOS. The goal is to preserve the strong embedd
 └──────────────────────────────────────────────────────────┘
 ```
 
+The inherited HAOS platform uses an **EROFS** read-only root filesystem, ZRAM for `/tmp` / `/var` / swap, a separate data partition, and RAUC A/B updates. GROL runtime sockets belong on `/run` (tmpfs), not on the EROFS root.
+
+AI components are userspace services. See `docs/decisions/0003-ai-userspace-boundary.md`.
+
 ## Initial design principles
 
 - **Reproducibility first.** Before GROL changes, an untouched upstream image must build and boot.

@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-09-22
+- Amended: 2026-09-22 (v0.3 adversarial review)
 
 ## Context
 
@@ -34,6 +35,8 @@ The AI control plane will live above the kernel:
 
 Only the Action Broker may cross into privileged Home Assistant or narrow GROL host capabilities.
 
+The Action Broker is the only AI-adjacent component allowed to hold a Home Assistant mutation token or the Host API socket. `grol-bot` and `grol-ai-gateway` get neither.
+
 ## Required properties
 
 1. AI services may fail without preventing normal boot.
@@ -44,6 +47,9 @@ Only the Action Broker may cross into privileged Home Assistant or narrow GROL h
 6. Model-supplied risk classifications never override broker policy.
 7. Provider credentials are provisioned at runtime and are not embedded in OS images.
 8. Host administration remains disabled by default for the AI path.
+9. No kernel module, out-of-tree driver, eBPF program, seccomp helper, or initramfs hook may execute model output or perform AI authorization.
+10. `grol-bot` and `grol-ai-gateway` must be startable and stoppable independently of pid1 reaching `multi-user.target`.
+11. Safe-mode / recovery boot paths MUST default the AI control plane off.
 
 ## Consequences
 
