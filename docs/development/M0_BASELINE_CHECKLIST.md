@@ -66,3 +66,42 @@ For every baseline attempt, record:
 Create a record under `docs/build-records/M0-<date>-<target>.md`.
 
 Do not begin compatibility-sensitive M1 changes until this checklist is complete.
+
+
+## GitHub Actions baseline path
+
+The inherited `.github/workflows/build.yaml` is usable from this fork for M0.
+
+For a focused first run in GitHub:
+
+1. Open **Actions → OS build → Run workflow**.
+2. Select branch `dev`.
+3. Set **boards** to `ova`.
+4. Set **publish** to `false`.
+5. Set **run_tests** to `true`.
+6. Set **hassio_channel** to `dev`.
+7. Run the workflow.
+
+Fork safety observed in the workflow:
+
+- forks force `publish_build=false`, so the build does not publish to Home Assistant's artifact infrastructure
+- if RAUC release secrets are absent, the workflow generates a temporary self-signed certificate for development
+- the builder image is created under the fork owner's GHCR namespace
+- OVA builds upload local GitHub Actions artifacts rather than upstream release assets
+
+With tests enabled, the inherited test workflow downloads the generated OVA QCOW2 artifact, boots it under QEMU/KVM, runs the existing integration test suite, and archives logs/JUnit reports.
+
+### Expected development artifacts for OVA
+
+Depending on the inherited workflow path, the run may expose:
+
+- `haos_ova-<version>.ova`
+- `haos_ova-<version>.qcow2.xz`
+- `haos_ova-<version>.raucb`
+- `haos_ova-<version>.vmdk.zip`
+- `haos_ova-<version>.vdi.zip`
+- `haos_ova-<version>.vhdx.zip`
+
+The `haos_` prefix is intentionally retained during M0 per ADR-0002.
+
+A successful GitHub workflow is strong M0 evidence, but the final build record should still capture the run, artifact hashes, and test conclusions.
