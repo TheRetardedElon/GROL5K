@@ -18,18 +18,18 @@ host="$(uname -a 2>/dev/null || echo 'unknown')"
 cat > "$out" <<EOF
 # GROL5K Build Record — DRAFT
 
-- Timestamp (UTC): `$stamp`
-- Target: `$target`
-- GROL5K commit: `$grol_sha`
-- Buildroot submodule: `${buildroot_sha:-unknown}`
-- Host: `$host`
-- Docker: `$docker_version`
+- Timestamp (UTC): $stamp
+- Target: $target
+- GROL5K commit: $grol_sha
+- Buildroot submodule: ${buildroot_sha:-unknown}
+- Host: $host
+- Docker: $docker_version
 
 ## Build command
 
-```text
+~~~text
 TODO
-```
+~~~
 
 ## Result
 
