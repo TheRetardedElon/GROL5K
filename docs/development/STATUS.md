@@ -28,6 +28,9 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - GROL foundation guardrails and CI workflow
 - build-record evidence generator
 - initial AI provider adapter contract
+- Grok repository review incorporated into architecture
+- ADR-0003: Grok/Grok Bot are first-class userspace services, not kernel components
+- Grok Bot runtime, Host API, tool-injection threat model, and voice/realtime v0 specs
 
 ## Immediate priorities
 
@@ -36,6 +39,7 @@ This file is the canonical short-form project handoff for humans and AI collabor
 3. Record hashes, host details, logs, and test results.
 4. Only after M0 passes, begin M1 visible identity changes.
 5. Keep Supervisor, OS Agent, RAUC compatibility, partition labels, and `haos-*` internal service names intact during early M1.
+6. After M0, implement M1 identity only; M2 host services come before M3/M4 AI runtime code.
 
 ## Current M1 identity candidates
 

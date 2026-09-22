@@ -27,6 +27,10 @@ grol/
 - [Action Broker v0](specs/ACTION_BROKER_V0.md)
 - [Action request JSON schema](specs/action-request.schema.json)
 - [AI Provider Adapter v0](specs/AI_PROVIDER_V0.md)
+- [Grok Bot Runtime v0](specs/GROK_BOT_RUNTIME_V0.md)
+- [GROL Host API v0](specs/HOST_API_V0.md)
+- [Tool / Prompt Injection Threat Model v0](specs/THREAT_MODEL_TOOL_INJECTION_V0.md)
+- [Voice / Realtime Session v0](specs/VOICE_REALTIME_V0.md)
 - [GROL services map](services/README.md)
 
 The exact Buildroot package layout for GROL services will be finalized after M0 reproduces and boots the inherited OVA baseline.

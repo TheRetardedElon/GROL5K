@@ -212,8 +212,13 @@ Start here:
 - [Upstream baseline and sync policy](GROL_UPSTREAM.md)
 - [ADR-0001 — HAOS downstream strategy](docs/decisions/0001-haos-downstream.md)
 - [ADR-0002 — compatibility boundary](docs/decisions/0002-compatibility-boundary.md)
+- [ADR-0003 — AI stays in userspace](docs/decisions/0003-ai-userspace-boundary.md)
 - [Action Broker v0 contract](grol/specs/ACTION_BROKER_V0.md)
 - [AI provider adapter v0](grol/specs/AI_PROVIDER_V0.md)
+- [Grok Bot runtime v0](grol/specs/GROK_BOT_RUNTIME_V0.md)
+- [GROL Host API v0](grol/specs/HOST_API_V0.md)
+- [Tool/prompt injection threat model v0](grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md)
+- [Voice/realtime session v0](grol/specs/VOICE_REALTIME_V0.md)
 - [Build-record evidence](docs/build-records/README.md)
 
 ---
