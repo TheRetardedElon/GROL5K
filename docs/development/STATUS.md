@@ -31,7 +31,7 @@ This file is the canonical short-form project handoff for humans and AI collabor
 
 ## Immediate priorities
 
-1. Reproduce the unmodified upstream OVA build.
+1. Run the inherited fork-safe **OS build** workflow for `ova` with tests enabled.
 2. Boot and validate the image in QEMU.
 3. Record hashes, host details, logs, and test results.
 4. Only after M0 passes, begin M1 visible identity changes.
