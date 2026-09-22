@@ -213,6 +213,8 @@ Start here:
 - [ADR-0001 — HAOS downstream strategy](docs/decisions/0001-haos-downstream.md)
 - [ADR-0002 — compatibility boundary](docs/decisions/0002-compatibility-boundary.md)
 - [Action Broker v0 contract](grol/specs/ACTION_BROKER_V0.md)
+- [AI provider adapter v0](grol/specs/AI_PROVIDER_V0.md)
+- [Build-record evidence](docs/build-records/README.md)
 
 ---
 

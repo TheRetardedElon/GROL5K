@@ -25,6 +25,9 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - development roadmap
 - initial build documentation
 - first architecture decision record
+- GROL foundation guardrails and CI workflow
+- build-record evidence generator
+- initial AI provider adapter contract
 
 ## Immediate priorities
 
