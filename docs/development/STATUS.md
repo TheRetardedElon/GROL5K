@@ -9,7 +9,7 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - Default branch: `dev`
 - GROL version: `0.1.0-dev`
 - Initial upstream baseline: `home-assistant/operating-system@3019c7fe8745900a3e9dcb3879d96bacf7958543`
-- Current phase: **Foundation / M0 preparation**
+- Current phase: **M0 PASSED / M1 identity ready**
 - Primary validation target: **OVA / QEMU**
 - First physical target: **generic x86-64 UEFI**
 - Later target: **Raspberry Pi 5**
@@ -40,14 +40,24 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - Fix: normalize the GHCR owner to lowercase before constructing `ghcr.io/<owner>/haos-builder`.
 - This is a build-workflow portability bug, not an OS/runtime failure and does not count as an M0 build attempt reaching Buildroot.
 
+## M0 result
+
+**PASS** — OS build #3 completed successfully from `dev@b2575b25cf6ae27387ffef2c82fe1d970205ab9d`.
+
+- OVA Buildroot build: PASS
+- Linux config validation: PASS
+- OVA/QCOW2/RAUC/VDI/VMDK/VHDX artifacts: generated
+- QEMU integration test job: PASS
+- logs + JUnit reports: archived
+- evidence: `docs/build-records/M0-2026-09-23-ova.md`
+
 ## Immediate priorities
 
-1. Merge the lowercase GHCR builder-path fix, then rerun the inherited fork-safe **OS build** workflow for `ova` with tests enabled.
-2. Boot and validate the image in QEMU.
-3. Record hashes, host details, logs, and test results.
-4. Only after M0 passes, begin M1 visible identity changes.
-5. Keep Supervisor, OS Agent, RAUC compatibility, partition labels, and `haos-*` internal service names intact during early M1.
-6. After M0, implement M1 identity only; M2 host services come before M3/M4 AI runtime code.
+1. Begin M1 visible identity changes on a dedicated branch.
+2. Change only safe presentation/identity surfaces first: hostname, issue/banner, MOTD, visible OS name, OVA product metadata, and boot presentation.
+3. Preserve Supervisor, OS Agent, RAUC compatibility, partition labels, `HAOS_ID`, and `haos-*` internal service names during early M1.
+4. Rebuild the OVA and rerun the same QEMU integration tests after each meaningful identity tranche.
+5. M2 host services come before M3/M4 AI runtime code.
 
 ## Current M1 identity candidates
 
