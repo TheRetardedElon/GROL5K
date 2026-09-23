@@ -1,6 +1,8 @@
 # GROL5K Development Roadmap
 
-## M0 — Reproducible upstream baseline
+## M0 — Reproducible upstream baseline ✅ COMPLETE
+
+M0 evidence: `docs/build-records/M0-2026-09-23-ova.md`
 
 Exit criteria:
 

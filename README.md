@@ -116,8 +116,8 @@ domains.
 
 | Milestone | Goal | Status |
 |---|---|---|
-| **M0** | Reproduce the upstream HAOS build and boot it unchanged | 🚧 In progress |
-| **M1** | GROL5000 identity, hostname, boot visuals, release metadata | Planned |
+| **M0** | Reproduce the upstream HAOS build and boot it unchanged | ✅ Complete |
+| **M1** | GROL5000 identity, hostname, boot visuals, release metadata | 🚧 Next |
 | **M2** | GROL-owned system services and health layer | Planned |
 | **M3** | Grok gateway, streaming, configuration, voice foundation | Planned |
 | **M4** | Grok Bot, action broker, policy engine, audit trail | Planned |
