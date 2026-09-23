@@ -51,6 +51,13 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - logs + JUnit reports: archived
 - evidence: `docs/build-records/M0-2026-09-23-ova.md`
 
+## M1 validation attempt history
+
+- **OS build #4**: OVA build and Linux config validation passed; QEMU test harness failed before shell access.
+- Root cause: inherited `tests/qemu-strategy.yaml` hard-coded `homeassistant login: `, while M1 correctly changed the hostname/login prompt to `grol5000 login: `.
+- This was a test-harness compatibility failure, not evidence that the M1 image failed to build.
+- Fix: accept both upstream and GROL login prompts in the QEMU strategy and add explicit GROL identity assertions.
+
 ## Immediate priorities
 
 1. Begin M1 visible identity changes on a dedicated branch.

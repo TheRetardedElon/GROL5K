@@ -43,6 +43,18 @@ def test_init(shell):
     _LOGGER.info("%s", "\n".join(output))
 
 
+
+def test_grol_identity(shell):
+    """Verify the M1 visible identity surfaces used by the console test path."""
+    hostname = shell.run_check("hostname")
+    assert "\n".join(hostname).strip() == "grol5000"
+
+    os_release = "\n".join(shell.run_check("cat /usr/lib/os-release"))
+    assert 'NAME="GROL5000 OS"' in os_release
+    assert 'PRETTY_NAME="GROL5000 OS ' in os_release
+    assert "HOME_URL=https://github.com/TheRetardedElon/grol5k" in os_release
+
+
 def test_rauc_status(shell, shell_json):
     rauc_status = shell.run_check("rauc status --output-format=shell --detailed")
     # RAUC_BOOT_PRIMARY won't be set if correct grub env is missing
