@@ -28,7 +28,7 @@ setup_vconsole
     echo "VERSION_ID=$(haos_version)"
     echo "PRETTY_NAME=\"${HAOS_NAME} $(haos_version)\""
     echo "CPE_NAME=cpe:2.3:o:home-assistant:${HAOS_ID}:$(haos_version):*:${DEPLOYMENT}:*:*:*:${BOARD_ID}:*"
-    echo "HOME_URL=https://www.home-assistant.io/"
+    echo "HOME_URL=https://github.com/TheRetardedElon/grol5k"
     echo "VARIANT=\"${HAOS_NAME} ${BOARD_NAME}\""
     echo "VARIANT_ID=${BOARD_ID}"
     echo "SUPERVISOR_MACHINE=${SUPERVISOR_MACHINE}"
