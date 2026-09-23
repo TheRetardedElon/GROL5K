@@ -58,6 +58,14 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - This was a test-harness compatibility failure, not evidence that the M1 image failed to build.
 - Fix: accept both upstream and GROL login prompts in the QEMU strategy and add explicit GROL identity assertions.
 
+## M1 validation attempt #5
+
+- **OS build #5**: image build passed; QEMU reached and executed the suite.
+- Result: **30 passed, 6 skipped, 2 failed**.
+- Failure 1 was in the new GROL identity test because this minimal image does not provide a `hostname` command. The identity itself was not disproven; the test command was wrong. The test now reads `/etc/hostname`.
+- Failure 2 was an AppArmor deny inside the Supervisor test path: `hassio-supervisor///usr/bin/git` receiving `SIGCONT` from `s6-linux-init-s`.
+- The AppArmor assertion remains intact. We will re-test the exact same #5 QCOW2 artifact before changing policy, to determine whether this is a reproducible regression or an intermittent Supervisor/runtime event.
+
 ## Immediate priorities
 
 1. Begin M1 visible identity changes on a dedicated branch.

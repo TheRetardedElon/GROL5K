@@ -46,7 +46,7 @@ def test_init(shell):
 
 def test_grol_identity(shell):
     """Verify the M1 visible identity surfaces used by the console test path."""
-    hostname = shell.run_check("hostname")
+    hostname = shell.run_check("cat /etc/hostname")
     assert "\n".join(hostname).strip() == "grol5000"
 
     os_release = "\n".join(shell.run_check("cat /usr/lib/os-release"))
