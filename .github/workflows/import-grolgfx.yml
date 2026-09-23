@@ -1,6 +1,7 @@
 name: Import GROL5000 graphics
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
