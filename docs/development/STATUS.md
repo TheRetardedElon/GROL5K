@@ -9,7 +9,7 @@ This file is the canonical short-form project handoff for humans and AI collabor
 - Default branch: `dev`
 - GROL version: `0.1.0-dev`
 - Initial upstream baseline: `home-assistant/operating-system@3019c7fe8745900a3e9dcb3879d96bacf7958543`
-- Current phase: **M0 PASSED / M1 identity ready**
+- Current phase: **M1 identity — tranche A implementation**
 - Primary validation target: **OVA / QEMU**
 - First physical target: **generic x86-64 UEFI**
 - Later target: **Raspberry Pi 5**
