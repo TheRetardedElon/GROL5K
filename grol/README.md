@@ -20,6 +20,7 @@ grol/
 - Do not place secrets or signing keys in this tree.
 - Cross-component interfaces should be documented under `grol/specs/`.
 - Privileged AI actions must go through the Action Broker boundary.
+- Grok Build is not installed unsandboxed on the appliance.
 - Keep compatibility-sensitive HAOS identifiers unchanged until an ADR and validation plan explicitly approve migration.
 
 ## Current specs
@@ -32,6 +33,7 @@ grol/
 - [Tool / Prompt Injection Threat Model v0](specs/THREAT_MODEL_TOOL_INJECTION_V0.md)
 - [Voice / Realtime Session v0](specs/VOICE_REALTIME_V0.md)
 - [Home Assistant Tool Policy v0](specs/HOME_ASSISTANT_TOOL_POLICY_V0.md)
+- [Grok Build v0](specs/GROK_BUILD_V0.md)
 - [GROL services map](services/README.md)
 
-The exact Buildroot package layout for GROL services will be finalized after M0 reproduces and boots the inherited OVA baseline.
+Product plan: [`docs/architecture/GROK_BOT_PRODUCT_PLAN.md`](../docs/architecture/GROK_BOT_PRODUCT_PLAN.md).
