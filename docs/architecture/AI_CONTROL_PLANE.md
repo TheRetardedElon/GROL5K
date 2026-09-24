@@ -4,6 +4,14 @@
 
 GROL5K integrates Grok and Grok Bot as first-class operating-system capabilities without making the model itself a privileged system process.
 
+Product plan: `docs/architecture/GROK_BOT_PRODUCT_PLAN.md`.
+
+## Names
+
+- **Grok** — xAI models behind `grol-ai-gateway`
+- **Grok Bot** — `grol-bot`, the only user-facing agent
+- **Grok Build** — optional coding harness, requested only as `grol.build.propose`, never an OS owner (ADR-0004)
+
 ## Components
 
 ### grol-ai-gateway
@@ -20,6 +28,8 @@ Provider-facing service responsible for:
 - provider abstraction for future model backends
 
 The gateway does not execute privileged host actions.
+The gateway does not enable provider-hosted tools in v0.
+The gateway owns the provider WebSocket; the UI never holds `XAI_API_KEY`.
 
 ### grol-bot
 
@@ -49,6 +59,8 @@ Responsibilities:
 - reject unknown or unsafe operations
 - mediate access to Home Assistant services and selected host APIs
 
+Home Assistant mutation uses entity-level grants. Scripts, scenes, and generic `homeassistant.turn_*` are denied in v0.
+
 ## Example flow
 
 ```text
@@ -65,11 +77,11 @@ Tool request
 Action Broker
   ↓
 Policy decision
-  ├── deny
-  ├── confirm with user
-  └── execute
+  ├─ deny
+  ├─ confirm with user
+  └─ execute
         ↓
- Home Assistant / GROL service
+ Home Assistant / GROL service / (later) build proposal store
 ```
 
 ## Risk tiers
@@ -89,3 +101,5 @@ The AI layer must not receive:
 - direct root shell access
 - long-lived broad host credentials
 - silent permission escalation
+- unsandboxed Grok Build / `grok` CLI on the host
+- provider-hosted MCP or web_search on the household session
