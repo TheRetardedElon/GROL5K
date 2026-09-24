@@ -9,6 +9,10 @@ function haos_pre_image() {
 
     cp "${BOARD_DIR}/../grub.cfg" "${EFIPART_DATA}/EFI/BOOT/grub.cfg"
     cp "${BOARD_DIR}/cmdline.txt" "${EFIPART_DATA}/cmdline.txt"
+    cp "${BR2_EXTERNAL_HAOS_PATH}/../GrolGFX/Grol5k.png" "${EFIPART_DATA}/EFI/BOOT/grol5k.png"
+    if [ -f "${HOST_DIR}/share/grub/unicode.pf2" ]; then
+        cp "${HOST_DIR}/share/grub/unicode.pf2" "${EFIPART_DATA}/EFI/BOOT/unicode.pf2"
+    fi
     grub-editenv "${EFIPART_DATA}/EFI/BOOT/grubenv" create
     grub-editenv "${EFIPART_DATA}/EFI/BOOT/grubenv" set ORDER="A B"
     grub-editenv "${EFIPART_DATA}/EFI/BOOT/grubenv" set A_OK=1
