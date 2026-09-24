@@ -1,66 +1,76 @@
 #!/bin/sh
-# ============================================================================
-# Console entry for GROL5000.
-# Still launches the Home Assistant compatibility CLI container when ready.
-# The ASCII banner inside that container is owned by plugin-cli, not this OS.
-# ============================================================================
+# GROL5000 tty console.
+# Does not auto-enter the inherited hassio_cli container.
+# Type `ha` for that compatibility CLI.
 
-run_shell() { exec /bin/ash -l; }
-interrupt() { echo " cancelled"; systemctl reset-failed "ha-cli@*"; run_shell; }
-emergency_shell() {
-    printf "\n\n[WARNING] Home Assistant compatibility CLI is not starting.\n"
-    echo ""
-    echo "GROL5000 is up. Supervisor or the CLI container is just slow."
-    echo "Useful commands:"
-    echo ""
-    echo " * 'docker ps -a'"
-    echo " * 'journalctl -e'"
-    echo " * 'exit' or Ctrl+D to retry the CLI"
-    echo ""
-    run_shell
+export PS1='grol > '
+
+grol_ip() {
+    ip -4 -o addr show scope global 2>/dev/null \
+        | awk '{print $4}' \
+        | cut -d/ -f1 \
+        | head -n1
 }
 
-trap interrupt INT
+grol_cli_state() {
+    if command -v docker >/dev/null 2>&1 && docker ps -q -f name=hassio_cli >/dev/null 2>&1; then
+        if [ -n "$(docker ps -q -f name=hassio_cli)" ]; then
+            echo Active
+            return
+        fi
+    fi
+    echo Starting
+}
 
-printf "\n"
-printf "  GROL5000 OS\n"
-printf "  Global Robotic Overlord Logic\n"
-printf "\n"
-printf "Waiting for Home Assistant compatibility CLI..."
+grol_supervisor_state() {
+    if command -v docker >/dev/null 2>&1; then
+        if [ -n "$(docker ps -q -f name=hassio_supervisor)" ]; then
+            echo Online
+            return
+        fi
+    fi
+    echo Starting
+}
 
-i=0
-while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
-    sleep 1
-
-    if [ $((i % 4)) = 0 ]; then
-        printf "\010\010\010   \010\010\010"
+grol_status() {
+    ipaddr=$(grol_ip)
+    [ -n "$ipaddr" ] || ipaddr=waiting
+    printf '\n'
+    printf '  GROL5000 OS\n'
+    printf '  Global Robotic Overlord Logic\n'
+    printf '\n'
+    printf '  Network:     %s\n' "$ipaddr"
+    if [ "$ipaddr" != waiting ]; then
+        printf '  Web UI:      http://%s:8123\n' "$ipaddr"
     else
-        printf "."
+        printf '  Web UI:      http://<ip>:8123\n'
     fi
+    printf '  Supervisor:  %s\n' "$(grol_supervisor_state)"
+    printf '  HA CLI:      %s\n' "$(grol_cli_state)"
+    printf '\n'
+    printf '  ha      inherited Home Assistant CLI\n'
+    printf '  status  reprint this card\n'
+    printf '  shell   busybox ash\n'
+    printf '\n'
+}
 
-    i=$((i+1))
-
-    if [ $i = 180 ]; then
-        emergency_shell
+ha() {
+    if [ -z "$(docker ps -q -f name=hassio_cli 2>/dev/null)" ]; then
+        echo 'hassio_cli is not running yet.'
+        return 1
     fi
-done
+    docker container exec -ti hassio_cli /usr/bin/cli.sh
+}
 
-docker container exec \
-    -ti hassio_cli \
-    /usr/bin/cli.sh
+status() { grol_status; }
 
-case $? in
-  10)
-    run_shell
-    ;;
-  130)
-    printf "\nCompatibility CLI interrupted.\n"
-    systemctl reset-failed "ha-cli@*"
-    ;;
-  143)
-    printf "\nCompatibility CLI terminated.\n"
-    ;;
-  *)
-    printf "\nCompatibility CLI failed with error code: %s\n" "$?"
-    ;;
-esac
+shell() { exec /bin/ash -l; }
+
+trap 'printf "\n"; exec /bin/ash -l' INT
+
+clear 2>/dev/null || true
+grol_status
+
+# Interactive appliance prompt. Keep this a login-capable shell so
+# recovery still works if Docker is down.
+exec /bin/ash -i
