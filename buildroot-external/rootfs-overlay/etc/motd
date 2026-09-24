@@ -1,1 +1,5 @@
-Welcome to \u001b[01;31mGROL5000 OS\u001b[00m.\n\nUse `ha` to access the Home Assistant compatibility CLI.\n
+Welcome to GROL5000 OS.
+
+This console is the appliance shell.
+The Home Assistant UI is on port 8123.
+Type `ha` for the compatibility CLI.

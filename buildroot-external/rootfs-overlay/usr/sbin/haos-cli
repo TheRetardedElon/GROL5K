@@ -1,27 +1,32 @@
 #!/bin/sh
-# ==============================================================================
-# Run logging cli
-# ==============================================================================
+# ============================================================================
+# Console entry for GROL5000.
+# Still launches the Home Assistant compatibility CLI container when ready.
+# The ASCII banner inside that container is owned by plugin-cli, not this OS.
+# ============================================================================
 
 run_shell() { exec /bin/ash -l; }
 interrupt() { echo " cancelled"; systemctl reset-failed "ha-cli@*"; run_shell; }
 emergency_shell() {
-    printf "\n\n[WARNING] Home Assistant CLI is not starting or was interrupted.\n"
+    printf "\n\n[WARNING] Home Assistant compatibility CLI is not starting.\n"
     echo ""
-    echo "This happens when start of all services takes longer than expected, or because"
-    echo "of slow internet connection. Emergency console has been started, you can use"
-    echo "for example the following commands for troubleshooting:"
+    echo "GROL5000 is up. Supervisor or the CLI container is just slow."
+    echo "Useful commands:"
     echo ""
-    echo " * 'docker ps -a' - e.g. to check if 'hassio_supervisor' container is running"
-    echo " * 'journalctl -e' - to investigate latest system logs"
-    echo " * 'exit' or Ctrl+D - to exit the emergency console and retry HA CLI startup"
+    echo " * 'docker ps -a'"
+    echo " * 'journalctl -e'"
+    echo " * 'exit' or Ctrl+D to retry the CLI"
     echo ""
     run_shell
 }
 
 trap interrupt INT
 
-printf "Waiting for the Home Assistant CLI to be ready..."
+printf "\n"
+printf "  GROL5000 OS\n"
+printf "  Global Robotic Overlord Logic\n"
+printf "\n"
+printf "Waiting for Home Assistant compatibility CLI..."
 
 i=0
 while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
@@ -46,20 +51,16 @@ docker container exec \
 
 case $? in
   10)
-    # Jump to root login shell (login command)
     run_shell
     ;;
   130)
-    # 130 is CLI termination with Ctrl+C (SIGINT)
-    printf "\nHome Assistant CLI has been interrupted.\n"
+    printf "\nCompatibility CLI interrupted.\n"
     systemctl reset-failed "ha-cli@*"
     ;;
   143)
-    # 143 graceful termination (SIGTERM). Most likely a proper shutdown.
-    # Just sleep for a while until actual systemd shutdown gets invoked.
-    printf "\nHome Assistant CLI has been terminated.\n"
+    printf "\nCompatibility CLI terminated.\n"
     ;;
   *)
-    printf "\nHA CLI failed with error code: %s\n" "$?"
+    printf "\nCompatibility CLI failed with error code: %s\n" "$?"
     ;;
 esac
