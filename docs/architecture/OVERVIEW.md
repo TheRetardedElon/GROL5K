@@ -6,6 +6,8 @@ GROL5K is a purpose-built smart-environment operating system descended from Home
 
 The goal is not merely to reskin HAOS. The goal is to preserve the strong embedded Linux, container, update, and hardware foundation while progressively replacing the user-facing identity, control plane, service layer, and operating experience with GROL-owned components.
 
+Grok Bot is the only user-facing agent. Grok Build is not an OS owner. See `docs/architecture/GROK_BOT_PRODUCT_PLAN.md`.
+
 ## Layer model
 
 ```text
@@ -38,6 +40,7 @@ AI components are userspace services. See `docs/decisions/0003-ai-userspace-boun
 - **Reproducibility first.** Before GROL changes, an untouched upstream image must build and boot.
 - **Additive before invasive.** Introduce GROL packages and services before renaming deep HAOS internals.
 - **AI is not root.** Grok and Grok Bot never receive unrestricted host or Docker access.
+- **Bot is the only mouth.** Grok Build is a sandboxed contractor, not a peer agent.
 - **Explicit privilege boundary.** All privileged actions flow through the GROL Action Broker.
 - **Local automation survives cloud loss.** Core home automation must remain operational if Grok/xAI is unavailable.
 - **Signed updates and rollback remain mandatory.**
@@ -55,8 +58,8 @@ AI components are userspace services. See `docs/decisions/0003-ai-userspace-boun
 - M0 — reproduce upstream HAOS build and boot
 - M1 — GROL identity and boot experience
 - M2 — GROL system services
-- M3 — Grok gateway integration
-- M4 — Grok Bot and privileged action broker
+- M3 — thin Grok gateway
+- M4 — thin Grok Bot and privileged action broker
 - M5 — GROL5000 UI and first-run experience
 - M6 — GROL-owned update/release pipeline
 - M7 — additional hardware targets

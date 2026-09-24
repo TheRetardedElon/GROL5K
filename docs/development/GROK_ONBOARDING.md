@@ -6,42 +6,39 @@ Welcome to GROL5K.
 
 Build GROL5000 into a real smart-environment operating system descended from HAOS, with first-class Grok and Grok Bot capabilities while preserving robust local automation, security boundaries, signed updates, and recoverability.
 
+Product sentence: GROL5000 is a home OS you talk to. Grok Bot is the only mouth. Grok is the brain. Grok Build is a contractor in a locked room. Home Assistant is the wiring. The Action Broker is the fuse box.
+
 ## Read in this order
 
 1. `README.md`
 2. `docs/development/STATUS.md`
 3. `GROL_UPSTREAM.md`
 4. `docs/architecture/OVERVIEW.md`
-5. `docs/architecture/COMPONENT_BOUNDARIES.md`
-6. `docs/architecture/AI_CONTROL_PLANE.md`
-7. `docs/architecture/SECURITY_MODEL.md`
-8. `docs/development/CODEBASE_MAP.md`
-9. `docs/development/ROADMAP.md`
-10. `docs/development/AI_COLLABORATION.md`
-11. `docs/decisions/0003-ai-userspace-boundary.md`
-12. `grol/specs/AI_PROVIDER_V0.md`
-13. `grol/specs/GROK_BOT_RUNTIME_V0.md`
-14. `grol/specs/HOST_API_V0.md`
-15. `grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md`
-16. `grol/specs/VOICE_REALTIME_V0.md`
-17. `grol/specs/HOME_ASSISTANT_TOOL_POLICY_V0.md`
-18. `grol/specs/ACTION_BROKER_V0.md`
+5. `docs/architecture/GROK_BOT_PRODUCT_PLAN.md`
+6. `docs/architecture/COMPONENT_BOUNDARIES.md`
+7. `docs/architecture/AI_CONTROL_PLANE.md`
+8. `docs/architecture/SECURITY_MODEL.md`
+9. `docs/development/CODEBASE_MAP.md`
+10. `docs/development/ROADMAP.md`
+11. `docs/development/AI_COLLABORATION.md`
+12. `docs/decisions/0003-ai-userspace-boundary.md`
+13. `docs/decisions/0004-grok-build-isolation.md`
+14. `grol/specs/AI_PROVIDER_V0.md`
+15. `grol/specs/GROK_BOT_RUNTIME_V0.md`
+16. `grol/specs/HOST_API_V0.md`
+17. `grol/specs/THREAT_MODEL_TOOL_INJECTION_V0.md`
+18. `grol/specs/VOICE_REALTIME_V0.md`
+19. `grol/specs/HOME_ASSISTANT_TOOL_POLICY_V0.md`
+20. `grol/specs/ACTION_BROKER_V0.md`
+21. `grol/specs/GROK_BUILD_V0.md`
 
 ## Current phase
 
-Foundation / M0 preparation.
+M0 has passed. M1 identity is in progress (A + B1). Next visible work is M1-B2 boot polish after a human inspects the current OVA splash/GRUB/login sequence.
 
-The project must first reproduce and boot the inherited OVA target before deep customization.
+Do not implement M3/M4 runtime until M1-B2 is accepted and M2 host sockets exist.
 
 The inherited HAOS root filesystem is **EROFS**, not squashfs.
-
-## Grok review status
-
-v0.2 specs landed in PR #4. v0.3 adversarial review tightened state, Host API isolation, hosted tools, and confirmation.
-
-v0.4/v0.4.1 add entity-level HA mutation policy, disable scripts/scenes, and introduce `grol-hostd` as the Host API owner.
-
-Do not implement M3/M4 runtime code until M0 has real build/boot evidence.
 
 ## Do not do yet
 
@@ -50,5 +47,6 @@ Do not implement M3/M4 runtime code until M0 has real build/boot evidence.
 - do not give Grok Bot Docker socket or Host API socket access
 - do not put xAI credentials into the image
 - do not enable provider-hosted tools
+- do not install unsandboxed Grok Build / `grok` CLI on the appliance
+- do not treat spoken "yes" as confirmation
 - do not rewrite HAOS internals for aesthetics
-- do not claim M0 passed without a real build and boot
