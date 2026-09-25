@@ -1,6 +1,6 @@
 [Unit]
 Description=GROL Host API
-After=local-fs.target systemd-tmpfiles-setup.service
+After=local-fs.target systemd-sysusers.service systemd-tmpfiles-setup.service
 Before=hassio-supervisor.service
 
 [Service]
@@ -15,11 +15,12 @@ ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes
 RestrictAddressFamilies=AF_UNIX AF_NETLINK
-MemoryDenyWriteExecute=yes
 LockPersonality=yes
 RestrictSUIDSGID=yes
 RuntimeDirectory=grol
 RuntimeDirectoryMode=0750
+# Do not set MemoryDenyWriteExecute — the Go runtime needs executable
+# anonymous mappings and will sit in activating/restart under MDWE.
 
 [Install]
 WantedBy=multi-user.target
