@@ -6,6 +6,8 @@ import pytest
 
 _LOGGER = logging.getLogger(__name__)
 
+BOOTING = r"Booting `"
+
 
 @pytest.mark.dependency()
 @pytest.mark.timeout(120)
@@ -78,7 +80,7 @@ def test_os_update(shell, shell_json, target):
     # The update is installed but inactive; apply it by rebooting into the new
     # slot (rauc already marked it as the primary boot slot on install).
     shell.console.sendline("ha host reboot --no-progress || true")
-    shell.console.expect("Booting `Slot ", timeout=120)
+    shell.console.expect(BOOTING, timeout=120)
 
     # reactivate ShellDriver to handle login again
     target.deactivate(shell)
@@ -116,7 +118,7 @@ def test_boot_other_slot(shell, shell_json, target):
     # use plain sendline instead of the run_check method
     shell.console.sendline(f"ha os boot-slot other --no-progress || true")
 
-    shell.console.expect("Booting `Slot ", timeout=60)
+    shell.console.expect(BOOTING, timeout=60)
 
     # reactivate ShellDriver to handle login again
     target.deactivate(shell)
