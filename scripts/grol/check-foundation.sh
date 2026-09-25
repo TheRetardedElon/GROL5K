@@ -22,13 +22,13 @@ require_file docs/development/M1_IDENTITY_MAP.md
 require_file docs/development/AI_COLLABORATION.md
 require_file docs/development/GROK_ONBOARDING.md
 require_file docs/architecture/COMPONENT_BOUNDARIES.md
+require_file docs/decisions/0005-ha-is-ancestry.md
 require_file grol/specs/ACTION_BROKER_V0.md
 require_file grol/specs/action-request.schema.json
 
 version="$(tr -d '[:space:]' < GROL_VERSION)"
 [[ "$version" =~ ^[0-9]+.[0-9]+.[0-9]+(-[A-Za-z0-9.-]+)?$ ]]   || fail "GROL_VERSION is not semver-like: $version"
 
-# M0/M1 compatibility guardrails.
 grep -qx 'HAOS_ID="haos"' buildroot-external/meta   || fail 'HAOS_ID changed; ADR-0002 requires explicit migration planning first'
 
 grep -q 'BR2_PACKAGE_HASSIO_MACHINE="qemux86-64"'   buildroot-external/configs/ova_defconfig   || fail 'OVA Supervisor machine ID changed unexpectedly'
