@@ -1,51 +1,51 @@
 # GROL5K Component Boundaries
 
-## GROL UI
+## GROL UI / Frontend
 
-May display Home Assistant state, converse with Grok Bot, show confirmations, and display system/update health.
+Target: GROL-owned frontend (HA frontend fork). May display house state,
+Bot, confirmations, grants, Build proposals, system health.
 
-Must not hold root credentials, talk directly to privileged host sockets, or bypass the Action Broker for sensitive actions.
+Must not hold root credentials or bypass the Action Broker.
 
 ## grol-ai-gateway
 
-Purpose: provider adapter and session transport.
-
-May authenticate to configured AI providers, stream responses, expose model capabilities, normalize tool calls, and manage realtime sessions.
-
-Must not execute host commands, call Docker directly, or mutate Home Assistant without a brokered tool.
+Provider adapter and session transport. No host shell, no Docker, no
+unbrokered Core mutation.
 
 ## grol-bot
 
-Purpose: persistent conversational agent.
+Persistent operator. Interprets intent, plans, requests tools, explains.
+Not an authorization source. Eventually a first-class Core agent
+(`grol.agent`), not only an external process.
 
-May interpret intent, plan, maintain allowed context, request tools, and explain outcomes.
+## grol-buildd
 
-Must not be trusted as an authorization source, possess unrestricted host privilege, or silently escalate an action's risk tier.
+Native construction runtime. Inspects, drafts, tests, stages. Does not
+apply live privileged changes itself.
 
 ## grol-action-broker
 
-Purpose: policy enforcement and capability execution.
+Policy and capability execution. The only AI-adjacent holder of HA
+mutation credentials and the Host API socket.
 
-May validate structured tool requests, check policy, request confirmation, invoke approved HA/GROL APIs, and write audit records.
+## GROL Core
 
-Must not accept arbitrary shell text as a capability, accept unknown tools by default, or let model prose override policy.
+Fork/evolution of Home Assistant Core. Device/entity/automation engine
+plus GROL domain objects (`grol.grant`, `grol.action`, `grol.build_job`,
+…). Started as a separate repo at M5. Not forbidden before then because
+it is sacred — delayed because M1/M2 live in the OS repo.
 
-## Home Assistant compatibility layer
+## GROL Supervisor
 
-Purpose: device, entity, automation, app, and integration ecosystem.
-
-Early GROL5K policy: preserve compatibility and use documented/control-plane APIs rather than patching Core for every GROL feature.
+Fork/evolution of Home Assistant Supervisor. Manages Core, apps, OS
+updates. GROL-owned when we need Supervisor-level identity, app policy,
+or Bot lifecycle that upstream will not take.
 
 ## GROL host services
 
-Purpose: OS-level functions that do not belong in Home Assistant.
+OS-level information and later controlled host operations. Narrow APIs
+to the broker. Not a second unpublished D-Bus stack.
 
-Examples: system identity, update status, hardware health, provisioning, recovery, and GROL service health.
+## Secrets
 
-Expose narrow APIs to the Action Broker rather than broad root access.
-
-## Secrets boundary
-
-Provider keys, signing keys, and sensitive tokens are never model context by default.
-
-AI services should receive only the minimum credential material required for their own outbound provider session.
+Provider keys and signing material are never model context by default.
