@@ -15,7 +15,7 @@ targets:
       - CustomTimeoutShellDriver:
           login_prompt: '(?:homeassistant|grol5000) login: '
           username: 'root'
-          prompt: '# '
+          prompt: '(?:# |grol > )'
           login_timeout: 300
           command_timeout: 300
       - QEMUShellStrategy: {}
