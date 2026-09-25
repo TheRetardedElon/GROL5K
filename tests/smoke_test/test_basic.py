@@ -55,6 +55,19 @@ def test_grol_identity(shell):
     assert "HOME_URL=https://github.com/TheRetardedElon/grol5k" in os_release
 
 
+def test_grol_hostd(shell):
+    """Verify the first GROL-owned host service is installed and running."""
+    binary = shell.run_check("test -x /usr/bin/grol-hostd && echo present")
+    assert "\n".join(binary).strip() == "present"
+
+    state = shell.run_check("systemctl is-active grol-hostd.service")
+    assert "\n".join(state).strip() == "active"
+
+    socket = shell.run_check("test -S /run/grol/hostapi.sock && echo socket")
+    assert "\n".join(socket).strip() == "socket"
+
+
+
 def test_rauc_status(shell, shell_json):
     rauc_status = shell.run_check("rauc status --output-format=shell --detailed")
     # RAUC_BOOT_PRIMARY won't be set if correct grub env is missing
