@@ -1,0 +1,4 @@
+# UIDs allowed to call HOST_API_V0.
+# Production: grol-action-broker, grol-healthd, grol-identity only.
+# 0 is for bring-up from the appliance console. Remove before M4.
+0

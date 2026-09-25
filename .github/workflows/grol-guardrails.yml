@@ -19,5 +19,11 @@ jobs:
           submodules: false
           persist-credentials: false
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+          cache-dependency-path: grol/services/grol-hostd/go.mod
+
       - name: Run GROL guardrails
         run: bash scripts/grol/check-foundation.sh

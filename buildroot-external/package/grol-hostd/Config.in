@@ -1,0 +1,6 @@
+config BR2_PACKAGE_GROL_HOSTD
+	bool "grol-hostd"
+	help
+	  GROL Host API daemon (HOST_API_V0). Unix socket only.
+	  Packaged like os-agent using Buildroot's golang-package.
+	  Source comes from the local GROL tree.

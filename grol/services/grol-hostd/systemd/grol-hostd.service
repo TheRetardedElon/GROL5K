@@ -1,0 +1,25 @@
+[Unit]
+Description=GROL Host API
+After=local-fs.target systemd-tmpfiles-setup.service
+Before=hassio-supervisor.service
+
+[Service]
+Type=simple
+User=grol-hostd
+Group=grol-hostapi
+ExecStart=/usr/bin/grol-hostd --socket /run/grol/hostapi.sock --allowlist /etc/grol/hostapi-allowlist
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RuntimeDirectory=grol
+RuntimeDirectoryMode=0750
+
+[Install]
+WantedBy=multi-user.target
