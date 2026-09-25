@@ -60,8 +60,34 @@ def test_grol_hostd(shell):
     binary = shell.run_check("test -x /usr/bin/grol-hostd && echo present")
     assert "\n".join(binary).strip() == "present"
 
-    state = shell.run_check("systemctl is-active grol-hostd.service")
-    assert "\n".join(state).strip() == "active"
+    # systemctl exits non-zero while a service is still "activating", so do
+    # not use run_check() directly here. Give early-boot ordering a bounded
+    # window to settle and preserve useful diagnostics if it never does.
+    state = ""
+    for _ in range(30):
+        state = "\n".join(
+            shell.run_check("systemctl is-active grol-hostd.service || true")
+        ).strip()
+        if state == "active":
+            break
+        sleep(1)
+
+    if state != "active":
+        status = "\n".join(
+            shell.run_check(
+                "systemctl --no-pager -l status grol-hostd.service || true"
+            )
+        )
+        journal = "\n".join(
+            shell.run_check(
+                "journalctl -b0 -u grol-hostd.service --no-pager -n 80 || true"
+            )
+        )
+        pytest.fail(
+            f"grol-hostd did not become active (state={state!r})\n"
+            f"--- systemctl status ---\n{status}\n"
+            f"--- journal ---\n{journal}"
+        )
 
     socket = shell.run_check("test -S /run/grol/hostapi.sock && echo socket")
     assert "\n".join(socket).strip() == "socket"
@@ -158,7 +184,7 @@ def test_custom_swap_size(shell, target):
     # set new swap size to half of the previous size - round to 4k blocks
     new_swap_size = (int(output[0]) // 2 // 4096) * 4096
     shell.console.sendline(f"echo 'SWAPSIZE={new_swap_size/1024/1024}M' > /etc/default/haos-swapfile; reboot")
-    shell.console.expect("Booting `Slot ", timeout=60)
+    shell.console.expect(r"Booting `(?:GROL5000 )?Slot ", timeout=60)
     # reactivate ShellDriver to handle login again
     target.deactivate(shell)
     target.activate(shell)
@@ -169,7 +195,7 @@ def test_custom_swap_size(shell, target):
 @pytest.mark.dependency(depends=["test_custom_swap_size"])
 def test_no_swap(shell, target):
     shell.console.sendline("echo 'SWAPSIZE=0' > /etc/default/haos-swapfile; reboot")
-    shell.console.expect("Booting `Slot ", timeout=60)
+    shell.console.expect(r"Booting `(?:GROL5000 )?Slot ", timeout=60)
     # reactivate ShellDriver to handle login again
     target.deactivate(shell)
     target.activate(shell)
