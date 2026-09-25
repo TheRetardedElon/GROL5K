@@ -24,6 +24,8 @@ require_file docs/development/GROK_ONBOARDING.md
 require_file docs/architecture/COMPONENT_BOUNDARIES.md
 require_file grol/specs/ACTION_BROKER_V0.md
 require_file grol/specs/action-request.schema.json
+require_file grol/specs/HOST_API_V0.md
+require_file grol/services/grol-hostd/grol_hostd.py
 
 version="$(tr -d '[:space:]' < GROL_VERSION)"
 [[ "$version" =~ ^[0-9]+.[0-9]+.[0-9]+(-[A-Za-z0-9.-]+)?$ ]]   || fail "GROL_VERSION is not semver-like: $version"
@@ -51,5 +53,7 @@ for path in [
         json.load(f)
     print(f"JSON OK: {path}")
 PY
+
+python3 grol/services/grol-hostd/tests/test_hostd.py
 
 echo "GROL foundation guardrails: PASS"

@@ -19,6 +19,13 @@ install_tini_docker
 setup_localtime
 setup_vconsole
 
+# GROL hostd (read-only Host API)
+install -d "${TARGET_DIR}/usr/lib/grol"
+install -m 0755 "${BR2_EXTERNAL_HAOS_PATH}/../grol/services/grol-hostd/grol_hostd.py" \
+    "${TARGET_DIR}/usr/lib/grol/grol-hostd.py"
+install -m 0755 "${BR2_EXTERNAL_HAOS_PATH}/../grol/services/grol-hostd/grol_hostctl.py" \
+    "${TARGET_DIR}/usr/bin/grol-hostctl"
+
 # Write os-release
 # shellcheck disable=SC2153
 (
