@@ -25,6 +25,10 @@ require_file docs/architecture/COMPONENT_BOUNDARIES.md
 require_file docs/decisions/0005-ha-is-ancestry.md
 require_file grol/specs/ACTION_BROKER_V0.md
 require_file grol/specs/action-request.schema.json
+require_file grol/specs/HOST_API_V0.md
+require_file grol/services/grol-hostd/go.mod
+require_file grol/services/grol-hostd/main.go
+require_file buildroot-external/package/grol-hostd/grol-hostd.mk
 
 version="$(tr -d '[:space:]' < GROL_VERSION)"
 [[ "$version" =~ ^[0-9]+.[0-9]+.[0-9]+(-[A-Za-z0-9.-]+)?$ ]]   || fail "GROL_VERSION is not semver-like: $version"
@@ -51,5 +55,11 @@ for path in [
         json.load(f)
     print(f"JSON OK: {path}")
 PY
+
+if command -v go >/dev/null 2>&1; then
+  (cd grol/services/grol-hostd && go test -count=1 ./...)
+else
+  echo "go not installed; skipped grol-hostd tests"
+fi
 
 echo "GROL foundation guardrails: PASS"

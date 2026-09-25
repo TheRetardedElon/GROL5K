@@ -1,5 +1,5 @@
 config BR2_PACKAGE_GROL_HOSTD
 	bool "grol-hostd"
-	depends on BR2_PACKAGE_HOST_GO
 	help
 	  GROL Host API daemon (HOST_API_V0). Unix socket only.
+	  Same packaging path as os-agent: golang-package from local tree.
