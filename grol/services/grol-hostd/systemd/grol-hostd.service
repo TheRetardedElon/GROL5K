@@ -1,7 +1,7 @@
 [Unit]
 Description=GROL Host API
 After=local-fs.target systemd-tmpfiles-setup.service
-Before=hassio-supervisor.service
+Before=haos-supervisor.service
 
 [Service]
 Type=simple
