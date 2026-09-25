@@ -60,19 +60,24 @@ def test_grol_hostd(shell):
     binary = shell.run_check("test -x /usr/bin/grol-hostd && echo present")
     assert "\n".join(binary).strip() == "present"
 
-    # systemctl exits non-zero while a service is still "activating", so do
-    # not use run_check() directly here. Give early-boot ordering a bounded
-    # window to settle and preserve useful diagnostics if it never does.
+    # Type=simple can report active just before the daemon has bound its Unix
+    # socket. Treat the service as ready only when both conditions are true.
     state = ""
+    socket_ready = False
     for _ in range(30):
         state = "\n".join(
             shell.run_check("systemctl is-active grol-hostd.service || true")
         ).strip()
-        if state == "active":
+        socket_ready = "\n".join(
+            shell.run_check(
+                "test -S /run/grol/hostapi.sock && echo yes || true"
+            )
+        ).strip() == "yes"
+        if state == "active" and socket_ready:
             break
         sleep(1)
 
-    if state != "active":
+    if state != "active" or not socket_ready:
         status = "\n".join(
             shell.run_check(
                 "systemctl --no-pager -l status grol-hostd.service || true"
@@ -83,14 +88,15 @@ def test_grol_hostd(shell):
                 "journalctl -b0 -u grol-hostd.service --no-pager -n 80 || true"
             )
         )
+        run_dir = "\n".join(
+            shell.run_check("ls -la /run/grol || true")
+        )
         pytest.fail(
-            f"grol-hostd did not become active (state={state!r})\n"
+            f"grol-hostd not ready (state={state!r}, socket={socket_ready})\n"
+            f"--- /run/grol ---\n{run_dir}\n"
             f"--- systemctl status ---\n{status}\n"
             f"--- journal ---\n{journal}"
         )
-
-    socket = shell.run_check("test -S /run/grol/hostapi.sock && echo socket")
-    assert "\n".join(socket).strip() == "socket"
 
 
 
@@ -184,10 +190,7 @@ def test_custom_swap_size(shell, target):
     # set new swap size to half of the previous size - round to 4k blocks
     new_swap_size = (int(output[0]) // 2 // 4096) * 4096
     shell.console.sendline(f"echo 'SWAPSIZE={new_swap_size/1024/1024}M' > /etc/default/haos-swapfile; reboot")
-    shell.console.expect(r"Booting `(?:GROL5000 )?Slot ", timeout=60)
-    # reactivate ShellDriver to handle login again
-    target.deactivate(shell)
-    target.activate(shell)
+    shell.reconnect_after_reboot(timeout=120)
     output = shell.run_check("stat -c '%s' /mnt/data/swapfile")
     assert int(output[0]) == new_swap_size, f"Incorrect swap size {new_swap_size}B: {output}"
 
@@ -195,10 +198,7 @@ def test_custom_swap_size(shell, target):
 @pytest.mark.dependency(depends=["test_custom_swap_size"])
 def test_no_swap(shell, target):
     shell.console.sendline("echo 'SWAPSIZE=0' > /etc/default/haos-swapfile; reboot")
-    shell.console.expect(r"Booting `(?:GROL5000 )?Slot ", timeout=60)
-    # reactivate ShellDriver to handle login again
-    target.deactivate(shell)
-    target.activate(shell)
+    shell.reconnect_after_reboot(timeout=120)
     output = shell.run_check("systemctl --no-pager -l list-units --state=failed")
     assert "0 loaded units listed." in output, f"Some units failed:\n{"\n".join(output)}"
     swapon = shell.run_check("swapon --show")
