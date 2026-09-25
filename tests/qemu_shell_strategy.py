@@ -26,6 +26,42 @@ class CustomTimeoutShellDriver(ShellDriver):
     def run_check(self, cmd: str, *, timeout=None, codec="utf-8", decodeerrors="strict"):
         return super().run_check(cmd, timeout=timeout or self.command_timeout, codec=codec, decodeerrors=decodeerrors)
 
+    def reconnect_after_reboot(self, timeout=180):
+        """Re-establish a usable host shell after either GROL or stock HAOS boots.
+
+        GROL5000 logs root into the appliance shell ("grol >"). A stock HAOS
+        slot may land in the interactive HA CLI ("ha >"), where "login"
+        enters the underlying root shell. Synchronize on the final console
+        state rather than on the GRUB boot banner.
+        """
+        idx = self.console.expect(
+            [
+                r"(?:homeassistant|grol5000) login: ",
+                r"ha > ",
+                r"(?:# |grol > )",
+            ],
+            timeout=timeout,
+        )
+
+        if idx == 0:
+            self.console.sendline(self.username)
+            idx = self.console.expect(
+                [
+                    r"(?:# |grol > )",
+                    r"ha > ",
+                    r"Password: ",
+                ],
+                timeout=30,
+            )
+            if idx == 2:
+                raise RuntimeError("unexpected password prompt while reconnecting root console")
+
+        if idx == 1:
+            # Stock Home Assistant OS exposes the appliance CLI first.
+            # "login" drops into the underlying root host shell used by tests.
+            self.console.sendline("login")
+            self.console.expect(r"# ", timeout=30)
+
 
 @target_factory.reg_driver
 @attr.s(eq=False)
