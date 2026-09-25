@@ -1,0 +1,4 @@
+# UIDs permitted to call the Host API. Production should list only
+# grol-action-broker / grol-healthd / grol-identity.
+# Root is allowed in v0 so the appliance console can run grol-hostctl.
+0

@@ -2,13 +2,17 @@
 import json
 import os
 import socket
+import sys
 import tempfile
 import threading
 import time
 import unittest
 from pathlib import Path
 
-from grol_hostd import handle_request, run_server
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from grol_hostd import handle_request, run_server  # noqa: E402
 
 
 class DispatchTests(unittest.TestCase):
