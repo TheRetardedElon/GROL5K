@@ -1,3 +1,4 @@
+#!/bin/sh
 # GROL5000 appliance console helpers.
 [ -n "$PS1" ] || return
 PS1='grol > '
