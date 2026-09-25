@@ -2,64 +2,45 @@
 
 ## Purpose
 
-GROL5K is a purpose-built smart-environment operating system descended from Home Assistant OS and designed around the GROL5000 identity, Grok integration, and a persistent Grok Bot agent.
+GROL5K starts as a Home Assistant OS fork and becomes GROL5000: a home
+operating system whose operator is Grok Bot and whose construction
+runtime is Grok Build.
 
-The goal is not merely to reskin HAOS. The goal is to preserve the strong embedded Linux, container, update, and hardware foundation while progressively replacing the user-facing identity, control plane, service layer, and operating experience with GROL-owned components.
+Home Assistant is ancestry. The integration ecosystem is kept. The
+product ceiling is GROL. See ADR-0005.
 
-Grok Bot is the only user-facing agent. Grok Build is not an OS owner. See `docs/architecture/GROK_BOT_PRODUCT_PLAN.md`.
-
-## Layer model
+## Layer model (target)
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│                    GROL5000 Experience                   │
-│ UI · Voice · Provisioning · Status · Recovery · Console │
-├──────────────────────────────────────────────────────────┤
-│                    GROL AI Control Plane                 │
-│ Grok Gateway · Grok Bot · Action Broker · Policy Engine │
-├──────────────────────────────────────────────────────────┤
-│                Home Automation Compatibility             │
-│ Home Assistant Core · Supervisor · Apps · Integrations  │
-├──────────────────────────────────────────────────────────┤
-│                    GROL System Services                  │
-│ Health · Identity · Provisioning · Telemetry · Updates  │
-├──────────────────────────────────────────────────────────┤
-│                  GROL5K / HAOS Platform                 │
-│ Buildroot · systemd · Docker · AppArmor · RAUC · GRUB   │
-├──────────────────────────────────────────────────────────┤
-│                         Hardware                         │
-└──────────────────────────────────────────────────────────┘
++----------------------------------------------------------+
+|                 GROL5000 Experience                      |
+| UI · Voice · Onboarding · Grants · Recovery · Console    |
++----------------------------------------------------------+
+|                 GROL AI + Build plane                    |
+| Gateway · Grok Bot · grol-buildd · Action Broker         |
++----------------------------------------------------------+
+|                 GROL-owned HA descendants                |
+| GROL Core · GROL Supervisor · Apps · Integrations        |
++----------------------------------------------------------+
+|                 GROL system services                     |
+| hostd · health · identity · provision · updates          |
++----------------------------------------------------------+
+|                 GROL OS / HAOS platform                  |
+| Buildroot · systemd · Docker · AppArmor · RAUC · EROFS   |
++----------------------------------------------------------+
+|                 Hardware                                 |
++----------------------------------------------------------+
 ```
 
-The inherited HAOS platform uses an **EROFS** read-only root filesystem, ZRAM for `/tmp` / `/var` / swap, a separate data partition, and RAUC A/B updates. GROL runtime sockets belong on `/run` (tmpfs), not on the EROFS root.
+AI components stay userspace (ADR-0003). They do not live in the kernel.
+They *do* become first-class across Core and Supervisor, not a sidecar
+chatbot.
 
-AI components are userspace services. See `docs/decisions/0003-ai-userspace-boundary.md`.
+## Principles
 
-## Initial design principles
-
-- **Reproducibility first.** Before GROL changes, an untouched upstream image must build and boot.
-- **Additive before invasive.** Introduce GROL packages and services before renaming deep HAOS internals.
-- **AI is not root.** Grok and Grok Bot never receive unrestricted host or Docker access.
-- **Bot is the only mouth.** Grok Build is a sandboxed contractor, not a peer agent.
-- **Explicit privilege boundary.** All privileged actions flow through the GROL Action Broker.
-- **Local automation survives cloud loss.** Core home automation must remain operational if Grok/xAI is unavailable.
-- **Signed updates and rollback remain mandatory.**
-- **Observable failure modes.** Every GROL service must expose health and failure state.
-- **Upstream remains trackable.** GROL divergence is documented rather than hidden.
-
-## Initial targets
-
-1. OVA/QEMU development image
-2. Generic x86-64 UEFI
-3. Raspberry Pi 5 after x86 baseline is stable
-
-## Milestone sequence
-
-- M0 — reproduce upstream HAOS build and boot
-- M1 — GROL identity and boot experience
-- M2 — GROL system services
-- M3 — thin Grok gateway
-- M4 — thin Grok Bot and privileged action broker
-- M5 — GROL5000 UI and first-run experience
-- M6 — GROL-owned update/release pipeline
-- M7 — additional hardware targets
+- Reproducibility first (M0 is done).
+- Additive before invasive *in the current milestone*, not forever.
+- AI is not root. Bot is the operator. Build is native and brokered.
+- Local automations survive xAI loss.
+- Signed updates stay mandatory.
+- Upstream HA is merged and tracked. It is not a veto.

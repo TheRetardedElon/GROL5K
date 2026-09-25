@@ -1,102 +1,56 @@
 # GROL5K Development Roadmap
 
-Canonical product intent for Bot / Build / voice:
-`docs/architecture/GROK_BOT_PRODUCT_PLAN.md`
+Canonical product intent: `docs/architecture/GROK_BOT_PRODUCT_PLAN.md`  
+Product ceiling: `docs/decisions/0005-ha-is-ancestry.md`
 
-## M0 — Reproducible upstream baseline ✅ COMPLETE
+## M0 — Reproducible upstream baseline ✅
 
-M0 evidence: `docs/build-records/M0-2026-09-23-ova.md`
+OVA builds, QEMU suite green, VirtualBox boot + `grol5000.local` onboarding proven.
 
 ## M1 — Identity
 
-Planned changes:
-
-- GROL hostname/default identity
-- console banner
-- `os-release` / release metadata
-- GROL artifact naming where safe
-- GRUB/boot branding
-- splash artwork
-- GROL version metadata
-
-Tranches:
-
-- **M1-A** — hostname, issue, MOTD, visible OS name, OVA product metadata
-- **M1-B1** — graphical GRUB / splash (`Grol5k.png`) without breaking QEMU suite
-- **M1-B2** — polish splash scale, GRUB text overlay, reduce pre-login boot noise
-
-No deep Supervisor, OS Agent, partition, or RAUC renaming yet.
-
-M1 is not complete until a human has visually inspected the OVA boot sequence and the QEMU suite still passes.
+GROL hostname, splash, quieter console, `grol >` face. No Core fork *this milestone*.
 
 ## M2 — GROL system layer
 
-Introduce:
-
-- `grol-hostd` (Host API on `/run/grol/hostapi.sock`)
-- `grol-healthd`
-- `grol-identity`
-- `grol-provision` (including xAI key slot and empty AI entity-grant file)
-
-No model runtime in M2.
+`grol-hostd`, health, identity, provision. No model runtime.
 
 ## M3 — Thin Grok gateway
 
-Introduce:
+`grol-ai-gateway`, provisioned xAI creds, streaming, tool events, voice transport.
 
-- `grol-ai-gateway`
-- xAI credential provisioning (not baked into the image)
-- streaming text
-- tool-call event normalization
-- realtime/voice transport ownership (gateway terminates provider WS)
-- provider abstraction
-- offline/degraded banner
+## M4 — Thin Grok Bot + native Build hook
 
-Hosted tools (`web_search`, MCP, collections, Grok Build CLI) stay **off**.
+`grol-bot`, Action Broker, entity grants, audit, push-to-talk.
+`grol-buildd` exists at least as propose/diagnose. Apply is brokered.
 
-## M4 — Thin Grok Bot
+## M5 — Own the HA-descended stack
 
-Introduce:
+Stand up GROL-owned repos (or official forks) of:
 
-- `grol-bot` as the only user-facing agent
-- Action Broker
-- entity-level HA policy (`light` / `switch` grants only)
-- confirmation UI (spoken "yes" is not confirmation)
-- audit trail
-- push-to-talk voice on the same broker path
+- Supervisor
+- Core
+- frontend
+- plugin-cli
 
-Optional later in M4, not the first slice:
+Introduce first-class Core objects: `grol.agent`, `grol.grant`,
+`grol.action`, `grol.build_job`, `grol.audit_event`, …
 
-- `grol.build.propose` drafts only (ADR-0004)
+Keep merging upstream HA so integrations are not abandoned.
 
-## M5 — GROL5000 experience
+## M6 — GROL5000 experience
 
-Introduce:
+GROL onboarding, dashboard, Bot surface, grants UI, CLI face, voice satellites.
 
-- branded first boot
-- GROL setup and entity-grant UX
-- primary dashboard
-- Grok Bot surface
-- voice satellite / phone-as-mic
-- system/update/recovery UI
+## M7 — Retire inherited product identity
 
-Wake word "Hey Grok" is after M5, not part of first voice.
+Landing page, Supervisor store chrome, and remaining "Home Assistant"
+product strings become GROL while the integration ecosystem stays.
 
-## M6 — Release system
+## M8 — GROL-owned distribution
 
-Introduce:
+CI, signed artifacts, channels, RAUC keys, SBOM.
 
-- GROL-owned CI
-- signed release artifacts
-- dev/beta/stable channels
-- RAUC signing ownership
-- rollback qualification
-- SBOM/provenance publication
+## M9 — Hardware expansion
 
-## M7 — Hardware expansion
-
-After x86/OVA stability:
-
-- Raspberry Pi 5
-- additional validated targets
-- hardware-specific boot/driver qualification
+Pi 5 and other boards after x86 is stable.
