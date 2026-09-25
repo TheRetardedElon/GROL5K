@@ -78,11 +78,7 @@ def test_os_update(shell, shell_json, target):
     # The update is installed but inactive; apply it by rebooting into the new
     # slot (rauc already marked it as the primary boot slot on install).
     shell.console.sendline("ha host reboot --no-progress || true")
-    shell.console.expect(r"Booting `(?:GROL5000 )?Slot ", timeout=120)
-
-    # reactivate ShellDriver to handle login again
-    target.deactivate(shell)
-    target.activate(shell)
+    shell.reconnect_after_reboot(timeout=180)
 
     # temporary needed for OS 17.0 -> 16.x path, where all containers must be re-downloaded
     while True:
@@ -115,12 +111,7 @@ def test_boot_other_slot(shell, shell_json, target):
     # as we sometimes don't get another shell prompt after the boot slot switch,
     # use plain sendline instead of the run_check method
     shell.console.sendline(f"ha os boot-slot other --no-progress || true")
-
-    shell.console.expect(r"Booting `(?:GROL5000 )?Slot ", timeout=60)
-
-    # reactivate ShellDriver to handle login again
-    target.deactivate(shell)
-    target.activate(shell)
+    shell.reconnect_after_reboot(timeout=180)
 
     # wait for the system to be ready after switching slots
     while True:
