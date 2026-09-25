@@ -9,6 +9,10 @@ runtime is Grok Build.
 Home Assistant is ancestry. The integration ecosystem is kept. The
 product ceiling is GROL. See ADR-0005.
 
+This git repo is the **appliance substrate** today. The browser UI is
+still an upstream Core container Supervisor pulls after boot. See
+`docs/architecture/SUBSTRATE_VS_RUNTIME.md`.
+
 ## Layer model (target)
 
 ```text
@@ -44,3 +48,4 @@ chatbot.
 - Local automations survive xAI loss.
 - Signed updates stay mandatory.
 - Upstream HA is merged and tracked. It is not a veto.
+- GRUB/console branding is substrate work, not the product experience.
