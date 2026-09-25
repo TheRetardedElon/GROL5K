@@ -1,11 +1,56 @@
 # Grok Bot product plan
 
-**Status:** accepted planning doc (2026-09-24).  
-**Does not authorize M3/M4 implementation yet.**
+**Status:** accepted planning doc (amended 2026-09-25, ADR-0005).  
+**Does not authorize M3/M4 implementation this week.**
 
 ## Product sentence
 
-GROL5000 is a home OS you talk to. Grok Bot is the only mouth. Grok is the brain. Grok Build is a contractor in a locked room. Home Assistant is the wiring. The Action Broker is the fuse box.
+GROL5000 is Home Assistant turned into a home operating system you talk
+to. Grok Bot is the operator. Grok is the intelligence. Grok Build is a
+native construction runtime behind a broker. Home Assistant is ancestry
+and the integration ecosystem, not the ceiling.
+
+## End-state (this is the product)
+
+```text
+                 YOU
+                  |
+                  v
+              Grok Bot
+                  |
+        +---------+----------+
+        v                    v
+   Grok reasoning        Grok Build
+        |                    |
+        |              inspect / code /
+        |              test / diagnose
+        +---------+----------+
+                  v
+          GROL Capability Layer
+                  |
+      +-----------+------------+
+      v           v            v
+ GROL Core   GROL Supervisor   Host OS
+      |           |            |
+      +-----------+------------+
+                  v
+           Physical house
+```
+
+Grok Bot is woven through Core, frontend, CLI, voice, grants, and Build.
+It is not a dashboard gadget talking to an unmodified Home Assistant.
+
+We will own, over the life of the project:
+
+- this OS repo
+- Supervisor
+- Core
+- frontend
+- CLI presentation
+- Bot, gateway, broker, buildd
+
+We merge upstream HA so their integrations keep landing. We do not treat
+those repos as forbidden to change.
 
 ## Three different Grok things
 
@@ -14,84 +59,64 @@ Do not collapse these names.
 | Name | What it is | Role on GROL5000 |
 |---|---|---|
 | **Grok** | xAI models (text, voice, coding) | Brain behind `grol-ai-gateway` |
-| **Grok Bot** | Persistent household agent (`grol-bot`) | Only thing the user talks to |
-| **Grok Build** | xAI coding agent CLI / harness (`grok`, ACP, skills, MCP) | A tool the Bot may *request*, never a second OS owner |
+| **Grok Bot** | Persistent household operator (`grol-bot`) | What the user talks to; eventually a Core-level agent |
+| **Grok Build** | Native `grol-buildd` plus xAI coding models | How Bot constructs automations, integrations, dashboards, GROL itself |
 
-Grok Build on a developer workstation (building this repo) is unrelated to Grok Build on the appliance. Laptop use stays on the laptop.
+Grok Build on a developer laptop working this git repo is separate from
+appliance `grol-buildd`.
 
-## User-visible flow
+## Grok Build is native
 
-```text
-"Hey Grok, turn on the kitchen lights"
-"Hey Grok, draft an automation that dims the hall at sunset"
-                |
-                v
-         GROL UI / voice satellite
-                |
-                v
-            grol-bot
-                |
-                v
-         grol-ai-gateway   <-- Grok text / Grok Voice / later Build harness
-                |
-                v
-         grol-action-broker
-           |-- Home Assistant (granted lights/switches only in v0)
-           |-- GROL Host API (status only in v0)
-           +-- grol-build sandbox (not in v0)
-```
+Bot is supposed to be able to say:
 
-If xAI is unreachable: local Home Assistant automations continue. Bot reports degraded. Nothing privileged is replayed when connectivity returns.
+- I need an automation for this
+- I need a new integration
+- I need to change this dashboard
+- I need to diagnose this device
+- I need to modify GROL configuration
 
-## Grok Build rules
+and invoke Build.
 
-Grok Build is a coding agent that can run shell, edit files, speak MCP, and loop until a task finishes. On a workstation that is the point. On an appliance that is a rootkit installer unless isolated.
+Build may inspect configuration and schemas, draft automations and
+integrations, generate dashboards, modify GROL-owned components, run
+tests, stage patches, request privileged apply, and roll back a failed
+change.
 
-**Grok Build never gets** the Docker socket, the Host API socket, an HA admin token, or the data partition as a writable workspace.
+Build may **not** be: cloud model → unrestricted root shell.
 
-Rollout:
+Apply still goes through the capability broker. That is an executor
+boundary, not a claim that Build is optional or off-box.
 
-1. **Advice only (first M4).** Bot asks a coding model for an HA automation *draft*. Result is a proposal. User sees it in UI. Broker still does not create automations/scripts/scenes in v0.
-2. **Sandboxed Build (after M4, needs ADR).** Headless `grok -p …` in a disposable container: scratch dir only, no host mounts of `/`, no HA, no Host API, network allowlist to xAI only. Bot receives a summary + files. Applying them is a separate brokered action.
-3. **Developer workstation.** Humans/GPT/Grok use Grok Build to work on `GROL5K`. That is not an OS feature.
-
-The future tool name is `grol.build.propose`. There is no `shell.exec`.
-
-Normative isolation notes: `grol/specs/GROK_BUILD_V0.md` and ADR-0004.
+Normative isolation: `grol/specs/GROK_BUILD_V0.md`, ADR-0004, ADR-0005.
 
 ## Voice ladder
 
-Spoken "yes" is not confirmation in v0. Ambient audio is a threat source.
+Spoken "yes" is not confirmation in the first voice slice.
 
 | Step | User experience | When |
 |---|---|---|
-| Push-to-talk in GROL UI / companion | Same Bot, Grok Voice realtime, tools through broker | M3 voice path + M4 broker |
-| HA voice satellite / phone as mic | Same session, local transport → gateway | M5 |
-| Wake word "Hey Grok" | After false-accept rate is measured | after M5 |
+| Push-to-talk | Bot + Grok Voice, tools through broker | M3 path + M4 broker |
+| Satellite / phone mic | Same session | M6 UX |
+| Wake word "Hey Grok" | After false-accept is measured | after M6 |
 
-First house command that should work:
+## Sequencing (order of work, not a ban list)
 
-```text
-User: turn on the kitchen lights
-Bot:  kitchen lights aren't approved for AI control yet.
-      [Approve light.kitchen_main]  [Not now]
-```
+1. M1-B2 polish on the OS we already booted.
+2. M2 host layer in this repo (`grol-hostd` …).
+3. Thin M3 gateway.
+4. Thin M4 Bot + broker + first granted lights/switches.
+5. **M5 begin GROL Core / Supervisor / frontend repos** and first-class
+   `grol.*` domain objects. This is planned ownership, not a maybe.
+6. M6 GROL-owned UX / onboarding / CLI face.
+7. M7 retire remaining HA product identity while keeping integrations.
+8. M8 GROL-owned distribution.
 
-Empty entity grant list at ship. Conversation text cannot create grants. See `HOME_ASSISTANT_TOOL_POLICY_V0.md`.
-
-## Sequencing (do not skip)
-
-1. Finish **M1-B1 visual inspect** of the current OVA (GRUB/`Grol5k.png`, boot text, `grol5000 login:`).
-2. **M1-B2** polished startup. Rebuild OVA. Same QEMU suite plus identity tests.
-3. **M2** host layer: `grol-hostd`, identity, health, provision (xAI key slot + empty grant file). No model code.
-4. **Thin M3**: `grol-ai-gateway` only. Provisioned key. Text stream + tool-call events. Hosted tools off. Degraded banner.
-5. **Thin M4**: `grol-bot` + Action Broker. `homeassistant.state.read` + granted `light.*` / `switch.*`. Confirmation UI. Audit. Push-to-talk voice on the same broker path.
-6. **Later**: `grol.build.propose`, automation-create ADR, wake word.
+M1 does not fork Core to change "Preparing Home Assistant." M5 does fork
+Core because GROL5000 is the product.
 
 ## Non-goals for the next engineering month
 
-- install the `grok` CLI on the GROL image with host filesystem access
-- enable xAI MCP / web_search / provider-hosted tools on the household session
-- let Bot create HA scripts or scenes
-- ship a wake word before push-to-talk works
-- start M3 runtime before M1-B2 is visually accepted and M2 sockets exist
+- unsandboxed `grok` CLI on the live appliance rootfs
+- provider-hosted tools on the household session
+- spoken "yes" as confirmation
+- pretending Core is off-limits forever
