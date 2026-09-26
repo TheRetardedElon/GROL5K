@@ -95,10 +95,15 @@ def test_os_update(shell, shell_json, target):
 
         sleep(1)
 
-    # check the updated version is now running and no update is pending anymore
+    # Check that the updated version is now running. Some Supervisor versions
+    # can briefly retain version_pending equal to the currently running version
+    # after activation; that is not a pending inactive update.
     os_info = shell_json("ha os info --no-progress --raw-json")["data"]
     assert os_info["version"] == stable_version, "OS did not update successfully"
-    assert not os_info.get("version_pending"), "OS update still pending after reboot"
+    pending = os_info.get("version_pending")
+    assert pending in (None, stable_version), (
+        f"unexpected OS version still pending after reboot: {pending}"
+    )
 
 
 @pytest.mark.dependency(depends=["test_os_update"])
