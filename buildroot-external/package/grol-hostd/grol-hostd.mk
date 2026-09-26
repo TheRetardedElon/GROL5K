@@ -20,8 +20,6 @@ endef
 define GROL_HOSTD_INSTALL_INIT_SYSTEMD
 	$(INSTALL) -D -m 0644 $(@D)/systemd/grol-hostd.service \
 		$(TARGET_DIR)/usr/lib/systemd/system/grol-hostd.service
-	$(INSTALL) -D -m 0644 $(@D)/systemd/grol-sysusers.conf \
-		$(TARGET_DIR)/usr/lib/sysusers.d/grol-hostd.conf
 	$(INSTALL) -D -m 0644 $(@D)/systemd/grol.conf \
 		$(TARGET_DIR)/usr/lib/tmpfiles.d/grol-hostd.conf
 	$(INSTALL) -D -m 0644 $(@D)/hostapi-allowlist \
