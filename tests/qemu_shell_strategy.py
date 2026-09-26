@@ -27,13 +27,16 @@ class CustomTimeoutShellDriver(ShellDriver):
         return super().run_check(cmd, timeout=timeout or self.command_timeout, codec=codec, decodeerrors=decodeerrors)
 
     def reconnect_after_reboot(self, timeout=180):
-        """Re-establish a usable host shell after either GROL or stock HAOS boots.
+        """Re-establish a fully initialized ShellDriver after a reboot.
 
-        Only post-reboot states are accepted initially. Do not match an existing
-        shell prompt here: immediately after sending reboot, the pre-reboot
-        grol > / # prompt may still be buffered and would cause a false
-        reconnect before the machine has actually restarted.
+        The pre-reboot driver state is invalid once the machine restarts.
+        Reconnect to either GROL5000 or stock HAOS, then restore the same
+        internal state ShellDriver.on_activate() normally establishes,
+        including the injected run() helper used by run_check().
         """
+        # Any prior shell state belongs to the old boot.
+        self._status = 0
+
         idx = self.console.expect(
             [
                 r"(?:homeassistant|grol5000) login: ",
@@ -58,10 +61,15 @@ class CustomTimeoutShellDriver(ShellDriver):
                 )
 
         if idx == 1:
-            # Stock Home Assistant OS exposes the appliance CLI first.
-            # "login" drops into the underlying root host shell used by tests.
+            # Stock HAOS lands in the appliance CLI. Enter the host shell.
             self.console.sendline("login")
             self.console.expect(r"# ", timeout=30)
+
+        # We now own a real host shell on the new boot. Recreate the state
+        # ShellDriver.on_activate() would normally establish.
+        self._status = 1
+        self._check_prompt()
+        self._inject_run()
 
 
 
