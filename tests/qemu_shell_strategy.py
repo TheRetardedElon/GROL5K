@@ -1,7 +1,9 @@
 import enum
 import os
+import time
 
 import attr
+from pexpect import TIMEOUT
 
 from labgrid import target_factory, step
 from labgrid.driver import ShellDriver
@@ -29,48 +31,49 @@ class CustomTimeoutShellDriver(ShellDriver):
     def reconnect_after_reboot(self, timeout=180):
         """Re-establish a fully initialized ShellDriver after a reboot.
 
-        The pre-reboot driver state is invalid once the machine restarts.
-        Reconnect to either GROL5000 or stock HAOS, then restore the same
-        internal state ShellDriver.on_activate() normally establishes,
-        including the injected run() helper used by run_check().
+        Discard every prompt from the previous boot by waiting for the new
+        GRUB line, then walk login / ha-cli / host-shell until labgrid can
+        inject run() on a real host prompt.
         """
-        # Any prior shell state belongs to the old boot.
         self._status = 0
+        self.console.expect(r"Booting `", timeout=timeout)
 
-        idx = self.console.expect(
-            [
-                r"(?:homeassistant|grol5000) login: ",
-                r"ha > ",
-            ],
-            timeout=timeout,
-        )
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            remaining = max(1, deadline - time.monotonic())
+            try:
+                idx = self.console.expect(
+                    [
+                        r"(?:homeassistant|grol5000) login: ",
+                        r"ha >",
+                        r"(?:# |grol > )",
+                        r"Password: ",
+                    ],
+                    timeout=min(15, remaining),
+                )
+            except TIMEOUT:
+                self.console.sendline("")
+                continue
 
-        if idx == 0:
-            self.console.sendline(self.username)
-            idx = self.console.expect(
-                [
-                    r"(?:# |grol > )",
-                    r"ha > ",
-                    r"Password: ",
-                ],
-                timeout=30,
-            )
-            if idx == 2:
+            if idx == 0:
+                self.console.sendline(self.username)
+                continue
+            if idx == 1:
+                # Stock HAOS appliance CLI (including after OTA to upstream).
+                self.console.sendline("login")
+                continue
+            if idx == 3:
                 raise RuntimeError(
                     "unexpected password prompt while reconnecting root console"
                 )
 
-        if idx == 1:
-            # Stock HAOS lands in the appliance CLI. Enter the host shell.
-            self.console.sendline("login")
-            self.console.expect(r"# ", timeout=30)
+            # idx == 2: host shell (# or grol >)
+            self._status = 1
+            self._inject_run()
+            self._check_prompt()
+            return
 
-        # We now own a real host shell on the new boot. Recreate the state
-        # ShellDriver.on_activate() would normally establish.
-        self._status = 1
-        self._check_prompt()
-        self._inject_run()
-
+        raise TIMEOUT(f"reconnect_after_reboot exceeded {timeout}s")
 
 
 @target_factory.reg_driver
