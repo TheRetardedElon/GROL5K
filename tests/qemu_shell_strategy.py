@@ -24,6 +24,9 @@ def _expect_index(console, pattern, timeout=-1):
     return result
 
 
+HOST_PROMPT = r"(?:# |grol > )"
+
+
 @target_factory.reg_driver
 @attr.s(eq=False)
 class CustomTimeoutShellDriver(ShellDriver):
@@ -74,7 +77,7 @@ class CustomTimeoutShellDriver(ShellDriver):
                 idx = _expect_index(
                     self.console,
                     [
-                        r"(?:# |grol > )",
+                        HOST_PROMPT,
                         r"ha >",
                         r"Password: ",
                     ],
@@ -87,7 +90,7 @@ class CustomTimeoutShellDriver(ShellDriver):
 
             if idx == 1:
                 self.console.sendline("login")
-                _expect_index(self.console, r"# ", timeout=30)
+                _expect_index(self.console, HOST_PROMPT, timeout=30)
 
             self._status = 1
             self._inject_run()
