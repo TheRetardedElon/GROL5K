@@ -16,6 +16,14 @@ class Status(enum.Enum):
     shell = 2
 
 
+def _expect_index(console, pattern, timeout=-1):
+    """labgrid ConsoleExpectMixin.expect returns a 4-tuple, not an index."""
+    result = console.expect(pattern, timeout=timeout)
+    if isinstance(result, tuple):
+        return result[0]
+    return result
+
+
 @target_factory.reg_driver
 @attr.s(eq=False)
 class CustomTimeoutShellDriver(ShellDriver):
@@ -29,37 +37,28 @@ class CustomTimeoutShellDriver(ShellDriver):
         return super().run_check(cmd, timeout=timeout or self.command_timeout, codec=codec, decodeerrors=decodeerrors)
 
     def reconnect_after_reboot(self, timeout=180):
-        """Re-establish a fully initialized ShellDriver after a reboot.
-
-        pexpect retains unmatched serial data between expect() calls. Old
-        GRUB/login/prompt text from the previous boot must not be allowed to
-        satisfy reconnect logic for the new boot, so explicitly discard the
-        buffered receive state before waiting for a fresh console state.
-        """
+        """Re-establish a fully initialized ShellDriver after a reboot."""
         self._status = 0
 
-        # Drop every byte pexpect has already buffered from the previous boot.
-        # PtxExpect is a pexpect.spawn subclass, so reset both internal buffers
-        # the same way pexpect itself does after EOF.
-        exp = self.console._expect
-        exp._buffer = exp.buffer_type()
-        exp._before = exp.buffer_type()
+        exp = getattr(self.console, "_expect", self.console)
+        buf_type = getattr(exp, "buffer_type", None)
+        if buf_type is not None:
+            exp._buffer = buf_type()
+            if hasattr(exp, "_before"):
+                exp._before = buf_type()
         exp.before = b""
         exp.after = None
         exp.match = None
         exp.match_index = None
 
-        # If the new boot is already sitting at a prompt, a blank line makes
-        # getty/ha-cli render that state again. If the old shell is still alive
-        # for a moment, the extra newline is harmless because host prompts are
-        # deliberately not accepted as an initial reconnect state.
         self.console.sendline("")
 
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             remaining = max(1, deadline - time.monotonic())
             try:
-                idx = self.console.expect(
+                idx = _expect_index(
+                    self.console,
                     [
                         r"(?:homeassistant|grol5000) login: ",
                         r"ha >",
@@ -67,13 +66,13 @@ class CustomTimeoutShellDriver(ShellDriver):
                     timeout=min(15, remaining),
                 )
             except TIMEOUT:
-                # Prompt an idle getty / appliance CLI to identify itself.
                 self.console.sendline("")
                 continue
 
             if idx == 0:
                 self.console.sendline(self.username)
-                idx = self.console.expect(
+                idx = _expect_index(
+                    self.console,
                     [
                         r"(?:# |grol > )",
                         r"ha >",
@@ -87,19 +86,15 @@ class CustomTimeoutShellDriver(ShellDriver):
                     )
 
             if idx == 1:
-                # Stock HAOS exposes the appliance CLI first.
                 self.console.sendline("login")
-                self.console.expect(r"# ", timeout=30)
+                _expect_index(self.console, r"# ", timeout=30)
 
-            # We now own a host shell from the new boot. Restore the internal
-            # state normally established by ShellDriver.on_activate().
             self._status = 1
             self._inject_run()
             self._check_prompt()
             return
 
         raise TIMEOUT(f"reconnect_after_reboot exceeded {timeout}s")
-
 
 
 @target_factory.reg_driver
@@ -129,7 +124,7 @@ class QEMUShellStrategy(Strategy):
             raise StrategyError(f"can not transition to {status}")
         elif status == self.status:
             step.skip("nothing to do")
-            return  # nothing to do
+            return
         elif status == Status.off:
             self.target.deactivate(self.qemu)
             self.target.deactivate(self.shell)
